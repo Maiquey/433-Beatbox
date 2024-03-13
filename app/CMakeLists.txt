@@ -23,10 +23,10 @@ add_custom_command(TARGET beat_box POST_BUILD
      "~/cmpt433/public/myApps/beat_box" 
   COMMENT "Copying ARM executable to public NFS directory")
 
-  # ---------------- NEW! ----------------
+# ---------------- NEW! ----------------
 # Copy the WAV folder to NFS
 add_custom_command(TARGET beat_box POST_BUILD 
 COMMAND "${CMAKE_COMMAND}" -E copy_directory
-   "${CMAKE_SOURCE_DIR}/wave-files"
-   "~/cmpt433/public/myApps/wave-files" 
+   "${CMAKE_SOURCE_DIR}/beatbox-wav-files"
+   "~/cmpt433/public/myApps/beatbox-wav-files" 
 COMMENT "Copying WAVE files to public NFS directory")
