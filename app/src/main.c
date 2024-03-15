@@ -4,18 +4,23 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "drumBeat.h"
+#include "zenCapeControls.h"
 
 int main()
 {
     // Initialize all modules; HAL modules first
     AudioMixer_init();
+    joystick_init();
     drumBeat_init();
+    zenCapeControls_init();
     
     // main logic
     while(true);
 
     // Cleanup all modules (HAL modules last)
+    zenCapeControls_cleanup();
     drumBeat_cleanup();
+    joystick_cleanup();
     AudioMixer_cleanup();
 
     printf("!!! DONE !!!\n"); 

@@ -18,10 +18,12 @@
 #include <unistd.h>     // for close()
 
 void joystick_init(void);
-int joystick_getJoyStickPress(long long timeout);
+int joystick_getJoyStickPressEpoll(long long timeout);
+int joystick_getJoyStickPress(void);
 bool joystick_checkIfPressed(void);
 void joystick_waitForRelease(void);
 bool joystick_isPressedUpDown(void);
 bool joystick_isPressedLeftRight(void);
+void joystick_cleanup(void);
 
 #endif

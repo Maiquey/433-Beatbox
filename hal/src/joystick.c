@@ -14,8 +14,11 @@
 #define JSLFT_DIRECTION "/sys/class/gpio/gpio65/direction"
 #define JSLFT_EDGE      "/sys/class/gpio/gpio65/edge"
 #define JSLFT_IN        "/sys/class/gpio/gpio65/value"
+#define JSPB_DIRECTION "/sys/class/gpio/gpio27/direction"
+#define JSPB_EDGE      "/sys/class/gpio/gpio27/edge"
+#define JSPB_IN        "/sys/class/gpio/gpio27/value"
 
-#define NUM_DIRECTIONS 4
+#define NUM_DIRECTIONS 5
 #define JOYSTICK_UP 0
 #define JOYSTICK_RIGHT 1
 #define JOYSTICK_DOWN 2
@@ -32,21 +35,24 @@ const char* DirectionFiles[NUM_DIRECTIONS] = {
     JSUP_DIRECTION,
     JSRT_DIRECTION,
     JSDN_DIRECTION,
-    JSLFT_DIRECTION
+    JSLFT_DIRECTION,
+	JSPB_DIRECTION
 };
 
 const char* ValueFiles[NUM_DIRECTIONS] = {
     JSUP_IN,
     JSRT_IN,
     JSDN_IN,
-    JSLFT_IN
+    JSLFT_IN,
+	JSPB_IN
 };
 
 const char* EdgeFiles[NUM_DIRECTIONS] = {
     JSUP_EDGE,
     JSRT_EDGE,
     JSDN_EDGE,
-    JSLFT_EDGE
+    JSLFT_EDGE,
+	JSPB_EDGE
 };
 
 // Courtesy of Assignment Description Doc
@@ -131,7 +137,7 @@ static int waitForGpioEdge(const char** fileNamesForGpioValue, long long timeout
 		int waitRet = epoll_wait(
 				epollfd, 
 				events, 
-				NUM_DIRECTIONS,                // maximum # events (4 possible directions)
+				NUM_DIRECTIONS,                // maximum # events (5 possible directions)
 				timeout);              // timeout in ms, -1 = wait indefinite; 0 = return immediately
 		if (waitRet == -1){
 			fprintf(stderr, "ERROR: epoll_wait() failed (%d) = %s\n", waitRet, strerror(errno));
@@ -160,6 +166,7 @@ void joystick_init(void)
 	runCommand("config-pin p8.15 gpio");
 	runCommand("config-pin p8.16 gpio");
 	runCommand("config-pin p8.17 gpio");
+	runCommand("config-pin p8.18 gpio");
 	// Configure joystick input and edge triggers
 	for (int i = 0; i < NUM_DIRECTIONS; i++){
         writeToFile(DirectionFiles[i], "in");
@@ -168,10 +175,15 @@ void joystick_init(void)
     }
 }
 
+void joystick_cleanup(void)
+{
+	//TODO: does anything need to be done here?
+}
+
 // Returns the ID of the joystick direction pressed according to the order specified at the top of this file
 // Returns TIMEOUT_CODE 4 if timeout on edge trigger reached
 // Returns -1 in case of an error (edge trigger error or no joystick not pressed in any direction)
-int joystick_getJoyStickPress(long long timeout){
+int joystick_getJoyStickPressEpoll(long long timeout){
 	// Block and wait for edge triggered change on GPIO pin
 
 	// Wait for an edge trigger:
@@ -194,6 +206,23 @@ int joystick_getJoyStickPress(long long timeout){
 		}
 	}
 	return ERROR_CODE;
+}
+
+//returns index of joystick press or -1 if no inputs pressed
+int joystick_getJoyStickPress(void)
+{
+	for (int i = 0; i < NUM_DIRECTIONS; i++){
+		char buff[BUFF_SIZE];
+		int bytesRead = readLineFromFile(ValueFiles[i], buff, BUFF_SIZE);
+		if (bytesRead > 0) {
+			if (buff[0] == 48){ // 48 == '0' in ASCII
+				return i;
+			}
+		} else {
+			fprintf(stderr, "ERROR: Read 0 bytes from GPIO input: %s\n", strerror(errno));
+		}
+	}
+	return -1;
 }
 
 bool joystick_checkIfPressed(void){

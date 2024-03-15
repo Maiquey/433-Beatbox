@@ -10,7 +10,7 @@ static wavedata_t bass;
 static wavedata_t hiHat;
 static wavedata_t snare;
 
-static int BPM = 200;
+static int BPM = 120;
 // Calculation for quarter note = 60000 / BPM (in ms)
 // Calculation for eighth note = 30000 / BPM (in ms)
 static void* drumMachineThread();
@@ -25,6 +25,8 @@ void drumBeat_init(void)
     AudioMixer_readWaveFileIntoMemory(BASS_DRUM, &bass);
     AudioMixer_readWaveFileIntoMemory(HI_HAT, &hiHat);
     AudioMixer_readWaveFileIntoMemory(SNARE, &snare);
+
+    isRunning = true;
     pthread_create(&drumThreadId, NULL, drumMachineThread, NULL);
 }
 
@@ -33,7 +35,6 @@ void drumBeat_init(void)
 static void* drumMachineThread()
 {
     assert(is_initialized);
-    isRunning = true;
     int halfBeat = 0;
     while (isRunning){
         if (halfBeat >= 8){

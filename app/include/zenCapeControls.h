@@ -2,20 +2,18 @@
 // Normally, you might create a module such as this for each module in
 // the application that does some high-level task; perhaps has its own thread.
 
-#ifndef _DRUMBEAT_H_
-#define _DRUMBEAT_H_
+#ifndef _ZENCAPE_CONTROLS_H_
+#define _ZENCAPE_CONTROLS_H_
 
 #include <stdio.h>
 #include <stdbool.h>
 #include <pthread.h>
 #include <assert.h>
 #include "hal/audioMixer.h"
+#include "hal/joystick.h"
 #include "hal/timing.h"
 
-void drumBeat_init(void);
-void drumBeat_cleanup(void);
-void drumBeat_cycleBeat(void);
-void drumBeat_adjustVolume(int increment);
-void drumBeat_adjustBPM(int increment);
+void zenCapeControls_init(void);
+void zenCapeControls_cleanup(void);
 
 #endif
