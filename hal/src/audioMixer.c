@@ -2,6 +2,7 @@
 // which are left as incomplete.
 // Note: Generates low latency audio on BeagleBone Black; higher latency found on host.
 #include "hal/audioMixer.h"
+#include "hal/timing.h"
 #include <alsa/asoundlib.h>
 #include <stdbool.h>
 #include <pthread.h>
@@ -38,12 +39,13 @@ typedef struct {
 static playbackSound_t soundBites[MAX_SOUND_BITES];
 
 // Playback threading
-void* playbackThread(void* arg);
+void* playbackThread();
 static bool stopping = false;
 static pthread_t playbackThreadId;
 static pthread_mutex_t audioMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static int volume = 0;
+static bool s_initialized = false;
 
 void AudioMixer_init(void)
 {
@@ -52,8 +54,10 @@ void AudioMixer_init(void)
 	// Initialize the currently active sound-bites being played
 	// REVISIT:- Implement this. Hint: set the pSound pointer to NULL for each
 	//     sound bite.
-
-
+	for (int i = 0; i < MAX_SOUND_BITES; i++){
+		soundBites[i].pSound = NULL;
+		soundBites[i].location = -1;
+	}
 
 
 	// Open the PCM output
@@ -86,6 +90,7 @@ void AudioMixer_init(void)
 
 	// Launch playback thread:
 	pthread_create(&playbackThreadId, NULL, playbackThread, NULL);
+	s_initialized = true;
 }
 
 
@@ -155,9 +160,20 @@ void AudioMixer_queueSound(wavedata_t *pSound)
 	 *    because the application most likely doesn't want to crash just for
 	 *    not being able to play another wave file.
 	 */
-
-
-
+	pthread_mutex_lock(&audioMutex);
+	{
+		for (int i = 0; i < MAX_SOUND_BITES; i++){
+			if (soundBites[i].location == -1){
+				soundBites[i].pSound = pSound;
+				soundBites[i].location = 0;
+				pthread_mutex_unlock(&audioMutex);
+				return;
+			}
+		}
+	}
+	pthread_mutex_unlock(&audioMutex);
+	printf("ERROR: could not queue Soundbite\n");
+	return;
 
 
 }
@@ -272,6 +288,32 @@ static void fillPlaybackBuffer(short *buff, int size)
 	 *          ... use someNum vs myArray[someIdx].value;
 	 *
 	 */
+	memset(buff, 0, size);
+	pthread_mutex_lock(&audioMutex);
+	{
+		for (int i = 0; i < MAX_SOUND_BITES; i++){ // for each sound bite
+			int offset = soundBites[i].location; // get the current offset
+			int maxOffset = soundBites[i].pSound->numSamples; // get max offset
+			if (offset != -1){
+				for (int j = 0; j < size; j++){
+					if (offset == maxOffset){
+						offset = -1;
+						break;
+					}
+					int pcmData = (int)buff[offset] + (int)soundBites[i].pSound->pData[offset];
+					if (pcmData > SHRT_MAX){
+						pcmData = SHRT_MAX;
+					} else if (pcmData < SHRT_MIN) {
+						pcmData = SHRT_MIN;
+					}
+					buff[offset] = (short)pcmData;
+					offset++;
+				}
+				soundBites[i].location = offset;
+			}
+		}
+	}
+	pthread_mutex_unlock(&audioMutex);
 
 
 
@@ -282,9 +324,8 @@ static void fillPlaybackBuffer(short *buff, int size)
 }
 
 
-void* playbackThread(void* arg)
+void* playbackThread()
 {
-
 	while (!stopping) {
 		// Generate next block of audio
 		fillPlaybackBuffer(playbackBuffer, playbackBufferSize);
@@ -304,7 +345,7 @@ void* playbackThread(void* arg)
 					frames);
 			exit(EXIT_FAILURE);
 		}
-		if (frames > 0 && frames < playbackBufferSize) {
+		if (frames > 0 && frames < (long int) playbackBufferSize) {
 			printf("Short write (expected %li, wrote %li)\n",
 					playbackBufferSize, frames);
 		}

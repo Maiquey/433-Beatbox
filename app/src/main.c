@@ -4,47 +4,30 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "badmath.h"
-#include "hal/button.h"
+#include "hal/audioMixer.h"
+#include "hal/timing.h"
+
+#define SOURCE_FILE "wave-files/100060__menegass__gui-drum-splash-hard.wav"
 
 int main()
 {
-    printf("Hello world!\n");
+    AudioMixer_init();
 
     // Initialize all modules; HAL modules first
-    button_init();
-    badmath_init();
 
+    wavedata_t crash;
+    AudioMixer_readWaveFileIntoMemory(SOURCE_FILE, &crash);
     // Main program logic:
-    for (int i = 0; i < 10; i++) {
-        printf("  -> Reading button time %d = %d\n", i, button_is_button_pressed());
+    
+    while (true){
+        AudioMixer_queueSound(&crash);
+        sleepForMs(1000);
     }
-
-    for (int i = 0; i <= 35; i++) {
-        int ans = badmath_factorial(i);
-        printf("%4d! = %6d\n", i, ans);
-    }
+    
 
     // Cleanup all modules (HAL modules last)
-    badmath_cleanup();
-    button_cleanup();
+    AudioMixer_cleanup();
 
     printf("!!! DONE !!!\n"); 
 
-    // Some bad code to try out and see what shows up.
-    #if 0
-        // Test your linting setup
-        //   - You should see a warning underline in VS Code
-        //   - You should see compile-time errors when building (-Wall -Werror)
-        // (Linting using clang-tidy; see )
-        int x = 0;
-        if (x = 10) {
-        }
-    #endif
-    #if 0
-        // Demonstrate -fsanitize=address (enabled in the root CMakeFiles.txt)
-        // Compile and run this code. Should see warning at compile time; error at runtime.
-        int data[3];
-        data[3] = 10;
-        printf("Value: %d\n", data[3]);
-    #endif
 }
