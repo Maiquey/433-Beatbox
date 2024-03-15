@@ -12,7 +12,7 @@ int main()
     drumBeat_init();
     
     // main logic
-    drumBeat_startRockBeat();
+    while(true);
 
     // Cleanup all modules (HAL modules last)
     drumBeat_cleanup();

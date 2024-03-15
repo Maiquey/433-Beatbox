@@ -7,11 +7,12 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <pthread.h>
+#include <assert.h>
 #include "hal/audioMixer.h"
 #include "hal/timing.h"
 
 void drumBeat_init(void);
-void drumBeat_startRockBeat(void);
 void drumBeat_cleanup(void);
 
 #endif

@@ -8,22 +8,29 @@ static wavedata_t bass;
 static wavedata_t hiHat;
 static wavedata_t snare;
 
-static bool isDrumBeat = false;
+static void* drumMachineThread();
+static pthread_t drumThreadId;
+static bool is_initialized = false;
+
+static bool isRunning = false;
 void drumBeat_init(void)
 {
+    assert(!is_initialized);
+    is_initialized = true;
     AudioMixer_readWaveFileIntoMemory(BASS_DRUM, &bass);
     AudioMixer_readWaveFileIntoMemory(HI_HAT, &hiHat);
     AudioMixer_readWaveFileIntoMemory(SNARE, &snare);
+    pthread_create(&drumThreadId, NULL, drumMachineThread, NULL);
 }
 
-// TODO: make run on seperate thread?
-// Tempo control?
+// TODO: change sleeptime based on tempo
 // for now assume 120 BPM
-void drumBeat_startRockBeat(void)
+static void* drumMachineThread()
 {
-    isDrumBeat = true;
+    assert(is_initialized);
+    isRunning = true;
     int halfBeat = 0;
-    while (isDrumBeat){
+    while (isRunning){
         if (halfBeat >= 8){
             halfBeat = 0;
         }
@@ -36,11 +43,17 @@ void drumBeat_startRockBeat(void)
         halfBeat++;
         sleepForMs(250);
     }
+
+    pthread_exit(NULL);
 }
 
 void drumBeat_cleanup(void)
 {
+    assert(is_initialized);
+    isRunning = false;
+    pthread_join(drumThreadId, NULL);
     AudioMixer_freeWaveFileData(&bass);
     AudioMixer_freeWaveFileData(&hiHat);
     AudioMixer_freeWaveFileData(&snare);
+    is_initialized = false;
 }
