@@ -3,29 +3,19 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "badmath.h"
-#include "hal/audioMixer.h"
-#include "hal/timing.h"
-
-#define SOURCE_FILE "wave-files/100060__menegass__gui-drum-splash-hard.wav"
+#include "drumBeat.h"
 
 int main()
 {
-    AudioMixer_init();
-
     // Initialize all modules; HAL modules first
-
-    wavedata_t crash;
-    AudioMixer_readWaveFileIntoMemory(SOURCE_FILE, &crash);
-    // Main program logic:
+    AudioMixer_init();
+    drumBeat_init();
     
-    while (true){
-        AudioMixer_queueSound(&crash);
-        sleepForMs(10000);
-    }
-    
+    // main logic
+    drumBeat_startRockBeat();
 
     // Cleanup all modules (HAL modules last)
+    drumBeat_cleanup();
     AudioMixer_cleanup();
 
     printf("!!! DONE !!!\n"); 
