@@ -90,42 +90,41 @@ static void processRx(char* messageRx, int bytesRx, struct sockaddr_in sinRemote
     if (!firstMessage && bytesRx == 1 && messageRx[0]){
         messageRx = lastMessage;
     }
-    // Generated with some help from chatGPT for efficiency
     if (strncmp(messageRx, "help", strlen("help")) == 0 || strncmp(messageRx, "?", strlen("?")) == 0){
         snprintf(messageTx, MAX_LEN, HELP_MSG);
     }
-    else if (strncmp(messageRx, "count", strlen("count")) == 0){
-        // snprintf(messageTx, MAX_LEN, "# samples taken total: %lld\n", Sampler_getNumSamplesTaken());
-    }
-    else if (strncmp(messageRx, "length", strlen("length")) == 0){
-        // snprintf(messageTx, MAX_LEN, "# samples taken last second: %d\n", Sampler_getHistorySize());
-    }
-    else if (strncmp(messageRx, "dips", strlen("dips")) == 0){
-        // snprintf(messageTx, MAX_LEN, "# Dips: %d\n", Sampler_getHistoryNumDips());
-    }
-    else if (strncmp(messageRx, "history", strlen("history")) == 0){
-        // pthread_mutex_lock(sampleHistoryMutex);
-        // int historySize = Sampler_getHistorySize();
-        // double* history = Sampler_getHistory(&historySize);
-        // pthread_mutex_unlock(sampleHistoryMutex);
-        // int offset = 0;
-        // int bytesWritten = 0;
-        // for (int i = 0; i < historySize; i++){
-        //     if ((i+1) % 10 == 0 || i == historySize - 1){
-        //         bytesWritten = snprintf(messageTx + offset, MAX_LEN - offset, "%.3f,\n", history[i]);
-        //     } else {
-        //         bytesWritten = snprintf(messageTx + offset, MAX_LEN - offset, "%.3f, ", history[i]);
-        //     }
-        //     offset += bytesWritten;
-        //     if (offset == MAX_WRITABLE_HISTORY){
-        //         sendto(socketDescriptor, messageTx, strlen(messageTx), 0, (struct sockaddr*) &sinRemote, sin_len);
-        //         memset(messageTx, 0, sizeof(messageTx));
-        //         offset = 0;
-        //         bytesWritten = 0;
-        //     }
-        // }
-        // free(history);
-    }
+    // else if (strncmp(messageRx, "count", strlen("count")) == 0){
+    //     // snprintf(messageTx, MAX_LEN, "# samples taken total: %lld\n", Sampler_getNumSamplesTaken());
+    // }
+    // else if (strncmp(messageRx, "length", strlen("length")) == 0){
+    //     // snprintf(messageTx, MAX_LEN, "# samples taken last second: %d\n", Sampler_getHistorySize());
+    // }
+    // else if (strncmp(messageRx, "dips", strlen("dips")) == 0){
+    //     // snprintf(messageTx, MAX_LEN, "# Dips: %d\n", Sampler_getHistoryNumDips());
+    // }
+    // else if (strncmp(messageRx, "history", strlen("history")) == 0){
+    //     // pthread_mutex_lock(sampleHistoryMutex);
+    //     // int historySize = Sampler_getHistorySize();
+    //     // double* history = Sampler_getHistory(&historySize);
+    //     // pthread_mutex_unlock(sampleHistoryMutex);
+    //     // int offset = 0;
+    //     // int bytesWritten = 0;
+    //     // for (int i = 0; i < historySize; i++){
+    //     //     if ((i+1) % 10 == 0 || i == historySize - 1){
+    //     //         bytesWritten = snprintf(messageTx + offset, MAX_LEN - offset, "%.3f,\n", history[i]);
+    //     //     } else {
+    //     //         bytesWritten = snprintf(messageTx + offset, MAX_LEN - offset, "%.3f, ", history[i]);
+    //     //     }
+    //     //     offset += bytesWritten;
+    //     //     if (offset == MAX_WRITABLE_HISTORY){
+    //     //         sendto(socketDescriptor, messageTx, strlen(messageTx), 0, (struct sockaddr*) &sinRemote, sin_len);
+    //     //         memset(messageTx, 0, sizeof(messageTx));
+    //     //         offset = 0;
+    //     //         bytesWritten = 0;
+    //     //     }
+    //     // }
+    //     // free(history);
+    // }
     else if (strncmp(messageRx, "stop", strlen("stop")) == 0){
         snprintf(messageTx, MAX_LEN, "Program terminating.\n");
     }
@@ -135,6 +134,7 @@ static void processRx(char* messageRx, int bytesRx, struct sockaddr_in sinRemote
 
     sendto(socketDescriptor, messageTx, strlen(messageTx), 0, (struct sockaddr*) &sinRemote, sin_len);
     if (strncmp(messageRx, "stop", strlen("stop")) == 0){
+        printf("supposedly stopping\n");
         pthread_cond_signal(mainCondVar);
         isRunning = false;
     }

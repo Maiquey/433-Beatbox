@@ -11,6 +11,9 @@ add_compile_options(-fdiagnostics-color)
 # (Comment this out to make your code faster)
 add_compile_options(-fsanitize=address)
 add_link_options(-fsanitize=address)
+# Comment out address sanitizer and uncomment these to run valgrind
+# add_compile_options(-pthread)
+# add_link_options(-pthread)
 
 # What folders to build
 add_subdirectory(hal)  

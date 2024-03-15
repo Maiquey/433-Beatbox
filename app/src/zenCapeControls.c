@@ -26,6 +26,7 @@ void zenCapeControls_init(void)
 void zenCapeControls_cleanup(void)
 {
     assert(is_initialized);
+    isRunning = false;
     pthread_join(joyStickThreadId, NULL);
     is_initialized = false;
 }

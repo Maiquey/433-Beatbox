@@ -122,7 +122,6 @@ void drumBeat_cleanup(void)
 void drumBeat_cycleBeat(void)
 {
     beatID = (beatID + 1) % NUM_BEATS;
-    currentBeat = 0;
 }
 
 void drumBeat_adjustVolume(int increment)
