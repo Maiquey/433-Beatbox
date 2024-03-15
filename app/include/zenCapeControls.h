@@ -12,6 +12,7 @@
 #include "hal/audioMixer.h"
 #include "hal/joystick.h"
 #include "hal/timing.h"
+#include "drumBeat.h"
 
 void zenCapeControls_init(void);
 void zenCapeControls_cleanup(void);

@@ -40,18 +40,23 @@ static void* joystickInputThread()
                 switch (joystickID) {
                     case JOYSTICK_IN:
                         // change beat
+                        drumBeat_cycleBeat();
                         break;
                     case JOYSTICK_UP:
                         // volume up by 5
+                        drumBeat_adjustVolume(5);
                         break;
                     case JOYSTICK_DOWN:
                         // volume down by 5
+                        drumBeat_adjustVolume(-5);
                         break;
                     case JOYSTICK_LEFT:
                         // BPM down by 5
+                        drumBeat_adjustBPM(-5);
                         break;
                     case JOYSTICK_RIGHT:
                         // BPM up by 5
+                        drumBeat_adjustBPM(5);
                         break;
                 }
                 debounceTimestamp = getTimeInMs();
