@@ -23,6 +23,8 @@ static int beatID = DEFAULT_BEAT_ID;
 // Calculation for quarter note = 60000 / BPM (in ms)
 // Calculation for eighth note = 30000 / BPM (in ms)
 
+static int currentBeat = 0;
+
 static void* drumMachineThread();
 static void* textDisplayThread();
 static pthread_t drumThreadId;
@@ -52,15 +54,14 @@ void drumBeat_init(void)
 static void* drumMachineThread()
 {
     assert(is_initialized);
-    int beat = 0;
     while (isRunning){
-        beat = beat % 4;
+        currentBeat = currentBeat % 4;
         switch (beatID){
             case 0: // silence
                 break;
             case 1: // rock beat
                 AudioMixer_queueSound(&hiHat);
-                if (beat % 2 == 0){
+                if (currentBeat % 2 == 0){
                     AudioMixer_queueSound(&bass);
                 } else {
                     AudioMixer_queueSound(&hardSnare);
@@ -71,23 +72,23 @@ static void* drumMachineThread()
                 break;
             case 2: // half-time shuffle
                 AudioMixer_queueSound(&hiHat);
-                if (beat == 0){
+                if (currentBeat == 0){
                     AudioMixer_queueSound(&bass);
-                } else if (beat == 2){
+                } else if (currentBeat == 2){
                     AudioMixer_queueSound(&hardSnare);
                 }
                 sleepForMs(QUARTER_NOTE_LENGTH_NUM / (BPM*3)); //triplets!
                 AudioMixer_queueSound(&softSnare);
                 sleepForMs(QUARTER_NOTE_LENGTH_NUM / (BPM*3));
                 AudioMixer_queueSound(&hiHat);
-                if (beat % 2 != 0){
+                if (currentBeat % 2 != 0){
                     AudioMixer_queueSound(&bass);
                 }
                 sleepForMs(QUARTER_NOTE_LENGTH_NUM / (BPM*3));
                 break;
         }
         
-        beat++;
+        currentBeat++;
 
     }
 
@@ -121,6 +122,7 @@ void drumBeat_cleanup(void)
 void drumBeat_cycleBeat(void)
 {
     beatID = (beatID + 1) % NUM_BEATS;
+    currentBeat = 0;
 }
 
 void drumBeat_adjustVolume(int increment)
