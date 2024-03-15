@@ -2,18 +2,21 @@
 
 #define BASS_DRUM "wave-files/100051__menegass__gui-drum-bd-hard.wav"
 #define HI_HAT "wave-files/100053__menegass__gui-drum-cc.wav"
-#define SNARE "wave-files/100059__menegass__gui-drum-snare-soft.wav"
+#define HARD_SNARE "wave-files/100058__menegass__gui-drum-snare-hard.wav"
+#define SOFT_SNARE "wave-files/100059__menegass__gui-drum-snare-soft.wav"
 
 #define DEFAULT_BPM 120
 #define MIN_BPM 60
 #define MAX_BPM 200
 #define EIGHTH_NOTE_LENGTH_NUM 30000
+#define QUARTER_NOTE_LENGTH_NUM 60000
 #define DEFAULT_BEAT_ID 1
 #define NUM_BEATS 3
 
 static wavedata_t bass;
 static wavedata_t hiHat;
-static wavedata_t snare;
+static wavedata_t hardSnare;
+static wavedata_t softSnare;
 
 static int BPM = 120;
 static int beatID = DEFAULT_BEAT_ID;
@@ -21,20 +24,27 @@ static int beatID = DEFAULT_BEAT_ID;
 // Calculation for eighth note = 30000 / BPM (in ms)
 
 static void* drumMachineThread();
+static void* textDisplayThread();
 static pthread_t drumThreadId;
+static pthread_t statsThreadId;
 static bool is_initialized = false;
 
 static bool isRunning = false;
 void drumBeat_init(void)
 {
     assert(!is_initialized);
-    is_initialized = true;
+    
     AudioMixer_readWaveFileIntoMemory(BASS_DRUM, &bass);
     AudioMixer_readWaveFileIntoMemory(HI_HAT, &hiHat);
-    AudioMixer_readWaveFileIntoMemory(SNARE, &snare);
+    AudioMixer_readWaveFileIntoMemory(HARD_SNARE, &hardSnare);
+    AudioMixer_readWaveFileIntoMemory(SOFT_SNARE, &softSnare);
 
     isRunning = true;
+    is_initialized = true;
     pthread_create(&drumThreadId, NULL, drumMachineThread, NULL);
+    pthread_create(&statsThreadId, NULL, textDisplayThread, NULL);
+
+    
 }
 
 // TODO: change sleeptime based on tempo
@@ -42,30 +52,56 @@ void drumBeat_init(void)
 static void* drumMachineThread()
 {
     assert(is_initialized);
-    int halfBeat = 0;
+    int beat = 0;
     while (isRunning){
+        beat = beat % 4;
         switch (beatID){
             case 0: // silence
                 break;
             case 1: // rock beat
-                if (halfBeat >= 8){
-                    halfBeat = 0;
-                }
                 AudioMixer_queueSound(&hiHat);
-                if (halfBeat % 4 == 0){
+                if (beat % 2 == 0){
                     AudioMixer_queueSound(&bass);
-                } else if (halfBeat % 2 == 0){
-                    AudioMixer_queueSound(&snare);
+                } else {
+                    AudioMixer_queueSound(&hardSnare);
                 }
+                sleepForMs(EIGHTH_NOTE_LENGTH_NUM / BPM);
+                AudioMixer_queueSound(&hiHat);
+                sleepForMs(EIGHTH_NOTE_LENGTH_NUM / BPM);
                 break;
-            case 2: // new beat (silence for now)
+            case 2: // half-time shuffle
+                AudioMixer_queueSound(&hiHat);
+                if (beat == 0){
+                    AudioMixer_queueSound(&bass);
+                } else if (beat == 2){
+                    AudioMixer_queueSound(&hardSnare);
+                }
+                sleepForMs(QUARTER_NOTE_LENGTH_NUM / (BPM*3)); //triplets!
+                AudioMixer_queueSound(&softSnare);
+                sleepForMs(QUARTER_NOTE_LENGTH_NUM / (BPM*3));
+                AudioMixer_queueSound(&hiHat);
+                if (beat % 2 != 0){
+                    AudioMixer_queueSound(&bass);
+                }
+                sleepForMs(QUARTER_NOTE_LENGTH_NUM / (BPM*3));
                 break;
         }
         
-        halfBeat++;
-        sleepForMs(EIGHTH_NOTE_LENGTH_NUM / BPM);
+        beat++;
+
     }
 
+    pthread_exit(NULL);
+}
+
+static void* textDisplayThread()
+{
+    assert(is_initialized);
+    while (isRunning){
+        printf("M%d %dbpm vol:%d Audio[%.3f, %.3f] avg %.3f/%d Accel[%.3f, %.3f] avg %.3f/%d\n",
+            beatID, BPM, AudioMixer_getVolume(), 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0);
+        sleepForMs(1000);
+    }
     pthread_exit(NULL);
 }
 
@@ -74,9 +110,11 @@ void drumBeat_cleanup(void)
     assert(is_initialized);
     isRunning = false;
     pthread_join(drumThreadId, NULL);
+    pthread_join(statsThreadId, NULL);
     AudioMixer_freeWaveFileData(&bass);
     AudioMixer_freeWaveFileData(&hiHat);
-    AudioMixer_freeWaveFileData(&snare);
+    AudioMixer_freeWaveFileData(&hardSnare);
+    AudioMixer_freeWaveFileData(&softSnare);
     is_initialized = false;
 }
 
