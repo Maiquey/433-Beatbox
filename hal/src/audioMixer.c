@@ -293,20 +293,22 @@ static void fillPlaybackBuffer(short *buff, int size)
 	{
 		for (int i = 0; i < MAX_SOUND_BITES; i++){ // for each sound bite
 			int offset = soundBites[i].location; // get the current offset
-			int maxOffset = soundBites[i].pSound->numSamples; // get max offset
 			if (offset != -1){
-				for (int j = 0; j < size; j++){
+				int maxOffset = soundBites[i].pSound->numSamples; // get max offset
+				short* localpData = soundBites[i].pSound->pData;
+				for (int buffIdx = 0; buffIdx < size; buffIdx++){
 					if (offset == maxOffset){
 						offset = -1;
 						break;
 					}
-					int pcmData = (int)buff[offset] + (int)soundBites[i].pSound->pData[offset];
+					// printf("{%d, %d}\n", buffIdx, offset);
+					int pcmData = (int)buff[buffIdx] + (int)localpData[offset];
 					if (pcmData > SHRT_MAX){
 						pcmData = SHRT_MAX;
 					} else if (pcmData < SHRT_MIN) {
 						pcmData = SHRT_MIN;
 					}
-					buff[offset] = (short)pcmData;
+					buff[buffIdx] = (short)pcmData;
 					offset++;
 				}
 				soundBites[i].location = offset;

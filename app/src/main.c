@@ -21,7 +21,7 @@ int main()
     
     while (true){
         AudioMixer_queueSound(&crash);
-        sleepForMs(1000);
+        sleepForMs(10000);
     }
     
 
