@@ -288,7 +288,7 @@ static void fillPlaybackBuffer(short *buff, int size)
 	 *          ... use someNum vs myArray[someIdx].value;
 	 *
 	 */
-	memset(buff, 0, size);
+	memset(buff, 0, size*sizeof(short));
 	pthread_mutex_lock(&audioMutex);
 	{
 		for (int i = 0; i < MAX_SOUND_BITES; i++){ // for each sound bite
@@ -301,7 +301,6 @@ static void fillPlaybackBuffer(short *buff, int size)
 						offset = -1;
 						break;
 					}
-					// printf("{%d, %d}\n", buffIdx, offset);
 					int pcmData = (int)buff[buffIdx] + (int)localpData[offset];
 					if (pcmData > SHRT_MAX){
 						pcmData = SHRT_MAX;
