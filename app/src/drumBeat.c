@@ -4,10 +4,15 @@
 #define HI_HAT "wave-files/100053__menegass__gui-drum-cc.wav"
 #define SNARE "wave-files/100059__menegass__gui-drum-snare-soft.wav"
 
+#define EIGHTH_NOTE_LENGTH_NUM 30000
+
 static wavedata_t bass;
 static wavedata_t hiHat;
 static wavedata_t snare;
 
+static int BPM = 200;
+// Calculation for quarter note = 60000 / BPM (in ms)
+// Calculation for eighth note = 30000 / BPM (in ms)
 static void* drumMachineThread();
 static pthread_t drumThreadId;
 static bool is_initialized = false;
@@ -41,7 +46,7 @@ static void* drumMachineThread()
             AudioMixer_queueSound(&snare);
         }
         halfBeat++;
-        sleepForMs(250);
+        sleepForMs(EIGHTH_NOTE_LENGTH_NUM / BPM);
     }
 
     pthread_exit(NULL);
