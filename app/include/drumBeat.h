@@ -10,6 +10,7 @@
 #include <pthread.h>
 #include <assert.h>
 #include "hal/audioMixer.h"
+#include "hal/accelerometer.h"
 #include "hal/timing.h"
 
 void drumBeat_init(void);

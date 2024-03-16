@@ -98,10 +98,17 @@ static void* drumMachineThread()
 static void* textDisplayThread()
 {
     assert(is_initialized);
+    AudioMixer_getStats();
+    accelerometer_getStats();
     while (isRunning){
-        printf("M%d %dbpm vol:%d Audio[%.3f, %.3f] avg %.3f/%d Accel[%.3f, %.3f] avg %.3f/%d\n",
-            beatID, BPM, AudioMixer_getVolume(), 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0);
         sleepForMs(1000);
+        Period_statistics_t* audioStats = AudioMixer_getStats();
+        Period_statistics_t* accelerometerStats = accelerometer_getStats();
+        printf("M%d %dbpm vol:%d Audio[%.3f, %.3f] avg %.3f/%d Accel[%.3f, %.3f] avg %.3f/%d\n",
+            beatID, BPM, AudioMixer_getVolume(), 
+            audioStats->minPeriodInMs, audioStats->maxPeriodInMs, audioStats->avgPeriodInMs, audioStats->numSamples, 
+            accelerometerStats->minPeriodInMs, accelerometerStats->maxPeriodInMs, accelerometerStats->avgPeriodInMs, accelerometerStats->numSamples);
+        
     }
     pthread_exit(NULL);
 }

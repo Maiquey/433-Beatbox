@@ -26,6 +26,8 @@ static bool is_initialized = false;
 static bool isRunning = true;
 static int i2cFileDesc;
 
+static Period_statistics_t *pStats;
+
 // From I2C Guide
 static int initI2cBus(char* bus, int address)
 {
@@ -115,6 +117,7 @@ void accelerometer_init(void)
 
     i2cFileDesc = initI2cBus(I2CDRV_LINUX_BUS1, I2C_DEVICE_ADDRESS);
     writeI2cReg(i2cFileDesc, CTRL_REG1, 0x27); // set power mode to 1
+    pStats = (Period_statistics_t*)malloc(sizeof(Period_statistics_t));
     // writeI2cReg(i2cFileDesc, REG_DIRB, 0x00);
     // unsigned char whoAmI = readI2cReg(i2cFileDesc, 0x0F);
     // printf("who am I? %x.\n", whoAmI);
@@ -158,6 +161,7 @@ void accelerometer_cleanup(void)
     assert(is_initialized);
     is_initialized = false;
     isRunning = false;
+    free(pStats);
     close(i2cFileDesc);
 }
 
@@ -201,9 +205,18 @@ unsigned char* accelerometer_readOutVals()
         perror("I2C: Unable to read from i2c registers");
         exit(1);
     }
+
+    Period_markEvent(PERIOD_EVENT_SAMPLE_ACCELEROMETER);
+
     memcpy(outputBuffer, readBuffer, sizeof(unsigned char) * (OUTPUT_BUFFER_SIZE));
     // for (int i = 0; i < OUTPUT_BUFFER_SIZE; i++){
     //     printf("register %d: %x = %d\n", i, readBuffer[i], readBuffer[i]);
     // }
     return outputBuffer;
+}
+
+Period_statistics_t* accelerometer_getStats()
+{
+    Period_getStatisticsAndClear(PERIOD_EVENT_SAMPLE_ACCELEROMETER, pStats);
+    return pStats;
 }

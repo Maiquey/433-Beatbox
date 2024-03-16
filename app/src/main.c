@@ -18,6 +18,7 @@ int main()
     pthread_cond_init(&condVarFinished, NULL);
 
     // Initialize all modules; HAL modules first
+    Period_init();
     AudioMixer_init();
     joystick_init();
     accelerometer_init();
@@ -37,6 +38,7 @@ int main()
     accelerometer_cleanup();
     joystick_cleanup();
     AudioMixer_cleanup();
+    Period_cleanup();
 
     // Free mutex and cond var 
     

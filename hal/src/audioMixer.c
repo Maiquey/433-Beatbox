@@ -1,8 +1,8 @@
 // Incomplete implementation of an audio mixer. Search for "REVISIT" to find things
 // which are left as incomplete.
 // Note: Generates low latency audio on BeagleBone Black; higher latency found on host.
+
 #include "hal/audioMixer.h"
-#include "hal/timing.h"
 #include <alsa/asoundlib.h>
 #include <stdbool.h>
 #include <pthread.h>
@@ -23,6 +23,7 @@ static snd_pcm_t *handle;
 static unsigned long playbackBufferSize = 0;
 static short *playbackBuffer = NULL;
 
+static Period_statistics_t *pStats;
 
 // Currently active (waiting to be played) sound bites
 #define MAX_SOUND_BITES 30
@@ -87,6 +88,9 @@ void AudioMixer_init(void)
 	snd_pcm_get_params(handle, &unusedBufferSize, &playbackBufferSize);
 	// ..allocate playback buffer:
 	playbackBuffer = malloc(playbackBufferSize * sizeof(*playbackBuffer));
+
+	//initialize pStats
+	pStats = (Period_statistics_t*)malloc(sizeof(Period_statistics_t));
 
 	// Launch playback thread:
 	pthread_create(&playbackThreadId, NULL, playbackThread, NULL);
@@ -196,6 +200,7 @@ void AudioMixer_cleanup(void)
 	free(playbackBuffer);
 	playbackBuffer = NULL;
 
+	free(pStats);
 	printf("Done stopping audio...\n");
 	fflush(stdout);
 }
@@ -316,6 +321,8 @@ static void fillPlaybackBuffer(short *buff, int size)
 	}
 	pthread_mutex_unlock(&audioMutex);
 
+	Period_markEvent(PERIOD_EVENT_FILL_PLAYBACK_BUFFER);
+
 
 
 
@@ -353,4 +360,10 @@ void* playbackThread()
 	}
 
 	return NULL;
+}
+
+Period_statistics_t* AudioMixer_getStats()
+{
+    Period_getStatisticsAndClear(PERIOD_EVENT_FILL_PLAYBACK_BUFFER, pStats);
+    return pStats;
 }

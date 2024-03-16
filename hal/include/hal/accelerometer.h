@@ -2,6 +2,8 @@
 #define _ACCELEROMETER_H_
 
 #include "hal/timing.h"
+// #include "hal/audioMixer.h"
+#include "hal/periodTimer.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -18,5 +20,6 @@ void accelerometer_init(void);
 void accelerometer_cleanup(void);
 // Returns dynamically allocated array of out values (must be freed by caller)
 unsigned char* accelerometer_readOutVals(void);
+Period_statistics_t* accelerometer_getStats();
 
 #endif

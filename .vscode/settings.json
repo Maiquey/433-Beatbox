@@ -5,6 +5,9 @@
         "audiomixer.h": "c",
         "assert.h": "c",
         "accelerometer.h": "c",
-        "joystick.h": "c"
+        "joystick.h": "c",
+        "alloca.h": "c",
+        "periodtimer.h": "c",
+        "asoundlib.h": "c"
     }
 }
