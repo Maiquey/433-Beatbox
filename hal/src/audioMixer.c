@@ -346,7 +346,7 @@ void* playbackThread()
 					frames);
 			exit(EXIT_FAILURE);
 		}
-		if (frames > 0 && frames < (long int) playbackBufferSize) {
+		if (frames > 0 && (long unsigned int)frames < playbackBufferSize) {
 			printf("Short write (expected %li, wrote %li)\n",
 					playbackBufferSize, frames);
 		}

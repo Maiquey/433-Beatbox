@@ -116,10 +116,29 @@ void accelerometer_init(void)
     // writeI2cReg(i2cFileDesc, REG_DIRB, 0x00);
     unsigned char whoAmI = readI2cReg(i2cFileDesc, 0x0F);
     printf("who am I? %x.\n", whoAmI);
-    
-    // writeToFile(LEFT_DIRECTION, "out");
-    // writeToFile(RIGHT_DIRECTION, "out");
+    unsigned char reg = readI2cReg(i2cFileDesc, OUT_X_L);
+    printf("reg? %x.\n", reg);
 
+    // TODO: make this a seperate function
+    // To read a register, must first write the address
+    unsigned char buffer[7];
+    buffer[0] = OUT_X_L + 0x80;
+    int res = write(i2cFileDesc, buffer, 7);
+    if (res != 7) {
+        perror("I2C: Unable to write i2c register.");
+        exit(1);
+    }
+
+    // Now read the value and return it
+    unsigned char readBuffer[7] = {0};
+    res = read(i2cFileDesc, &readBuffer, sizeof(readBuffer));
+    if (res != sizeof(readBuffer)) {
+        perror("I2C: Unable to read from i2c register");
+        exit(1);
+    }
+    for (int i = 0; i < 7; i++){
+        printf("register %d: %x\n", i, buffer[i]);
+    }
 }
 
 void accelerometer_cleanup(void)
