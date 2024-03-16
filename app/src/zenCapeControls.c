@@ -7,8 +7,18 @@
 #define JOYSTICK_LEFT 3
 #define JOYSTICK_IN 4
 
+// TODO: fine-tune debounce timers
 #define JOYSTICK_DEBOUNCE_TIME 200
-#define ACCELEROMETER_DEBOUNCE_TIME 100
+#define ACCELEROMETER_BASS_DEBOUNCE_TIME 100
+#define ACCELEROMETER_HIHAT_DEBOUNCE_TIME 100
+#define ACCELEROMETER_SNARE_DEBOUNCE_TIME 100
+
+#define X_THRESHOLD 8000
+#define X_REBOUND 6000
+#define Y_THRESHOLD 8000
+#define Y_REBOUND 8000
+#define Z_THRESHOLD 8000
+#define Z_REBOUND 6000
 
 static void* joystickInputThread();
 static void* accelerometerSamplingThread();
@@ -75,42 +85,63 @@ static void* joystickInputThread()
 
 static void* accelerometerSamplingThread()
 {
-    long long debounceTimestamp = getTimeInMs();
+    // X normal range = {176, 352}
+    // Y normal range = {-384, -32}
+    // Z normal range = {16464, 16672}
+    long long debounceTimerBass = getTimeInMs();
+    long long debounceTimerHiHat = debounceTimerBass;
+    long long debounceTimerSnare = debounceTimerBass;
     unsigned char* accInitial = accelerometer_readOutVals();
     int16_t x_last = (accInitial[1] << 8) | accInitial[0];
     int16_t y_last = (accInitial[3] << 8) | accInitial[2];
     int16_t z_last = (accInitial[5] << 8) | accInitial[4];
-    int16_t z_floor = z_last - 6000;
+    int16_t x_floor = x_last - X_THRESHOLD;
+    int16_t y_floor = y_last - Y_THRESHOLD;
+    int16_t z_floor = z_last - Z_THRESHOLD;
+    int16_t min = z_last;
+    int16_t max = z_last;
     free(accInitial);
     while(isRunning){
-        if (getTimeInMs() - debounceTimestamp > ACCELEROMETER_DEBOUNCE_TIME)
-        {
-            unsigned char* accelerometerOutput = accelerometer_readOutVals();
-            int16_t x_data = (accelerometerOutput[1] << 8) | accelerometerOutput[0];
-            int16_t y_data = (accelerometerOutput[3] << 8) | accelerometerOutput[2];
-            int16_t z_data = (accelerometerOutput[5] << 8) | accelerometerOutput[4];
-            bool valRead = false;
-            if (x_data < 0 && x_last > 0){
-                printf("HIHAT\n");
-                valRead = true;
-            }
-            if (y_data < 0 && y_last > 0){
-                printf("SNARE\n");
-                valRead = true;
-            }
-            if (z_data < z_floor && z_last > z_floor){
-                printf("BASS\n");
-                valRead = true;
-            }
-            x_last = x_data;
-            y_last = y_data;
-            z_last = z_data;
-            // printf("OUT_X_L val: %d\n", z_data);
-            free(accelerometerOutput);
-            if (valRead){
-                debounceTimestamp = getTimeInMs();
-            }
+        unsigned char* accelerometerOutput = accelerometer_readOutVals();
+        int16_t x_data = (accelerometerOutput[1] << 8) | accelerometerOutput[0];
+        int16_t y_data = (accelerometerOutput[3] << 8) | accelerometerOutput[2];
+        int16_t z_data = (accelerometerOutput[5] << 8) | accelerometerOutput[4];
+        
+        if ((getTimeInMs() - debounceTimerHiHat > ACCELEROMETER_HIHAT_DEBOUNCE_TIME) 
+            && x_last < x_floor 
+            && x_data > x_last + X_REBOUND){
+            // printf("HIHAT\n");
+            drumBeat_playHiHat();
+            debounceTimerHiHat = getTimeInMs();
         }
+        if ((getTimeInMs() - debounceTimerSnare > ACCELEROMETER_SNARE_DEBOUNCE_TIME) 
+            && y_last < y_floor 
+            && y_data > y_last + Y_REBOUND){
+            // printf("SNARE\n");
+            drumBeat_playHardSnare();
+            debounceTimerSnare = getTimeInMs();
+        }
+        if ((getTimeInMs() - debounceTimerBass > ACCELEROMETER_BASS_DEBOUNCE_TIME) 
+            && z_last < z_floor 
+            && z_data > z_last + Z_REBOUND){
+            // printf("BASS\n");
+            drumBeat_playBass();
+            debounceTimerBass = getTimeInMs();
+        }
+        x_last = x_data;
+        y_last = y_data;
+        z_last = z_data;
+        // printf("OUT_X_L val: %d\n", z_data);
+        free(accelerometerOutput);
+        if (z_data < min){
+            min = z_data;
+        }
+        if (z_data > max){
+            max = z_data;
+        }
+        // printf("{%d, %d}\n", min, max);
+        // printf("%d\n", z_data);
+        
         sleepForMs(10);
     }
     pthread_exit(NULL);

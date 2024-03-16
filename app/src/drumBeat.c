@@ -10,7 +10,7 @@
 #define MAX_BPM 200
 #define EIGHTH_NOTE_LENGTH_NUM 30000
 #define QUARTER_NOTE_LENGTH_NUM 60000
-#define DEFAULT_BEAT_ID 1
+#define DEFAULT_BEAT_ID 0
 #define NUM_BEATS 3
 
 static wavedata_t bass;
