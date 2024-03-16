@@ -20,6 +20,7 @@ int main()
     // Initialize all modules; HAL modules first
     AudioMixer_init();
     joystick_init();
+    accelerometer_init();
     drumBeat_init();
     zenCapeControls_init();
     Network_init(&condVarFinished);
@@ -33,6 +34,7 @@ int main()
     Network_cleanup();
     zenCapeControls_cleanup();
     drumBeat_cleanup();
+    accelerometer_cleanup();
     joystick_cleanup();
     AudioMixer_cleanup();
 
