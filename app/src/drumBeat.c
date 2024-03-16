@@ -49,8 +49,6 @@ void drumBeat_init(void)
     
 }
 
-// TODO: change sleeptime based on tempo
-// for now assume 120 BPM
 static void* drumMachineThread()
 {
     assert(is_initialized);

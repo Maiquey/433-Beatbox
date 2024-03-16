@@ -167,28 +167,6 @@ void accelerometer_cleanup(void)
 
 unsigned char* accelerometer_readOutVals()
 {
-    // TODO: make this a seperate function
-    // To read a register, must first write the address
-    // unsigned char buffer[OUTPUT_BUFFER_SIZE];
-    // buffer[0] = OUT_X_L + 0x80;
-    // int res = write(i2cFileDesc, buffer, OUTPUT_BUFFER_SIZE);
-    // if (res != OUTPUT_BUFFER_SIZE) {
-    //     perror("I2C: Unable to write i2c register.");
-    //     exit(1);
-    // }
-
-    // // Now read the value and return it
-    // unsigned char* readBuffer = (unsigned char*)malloc(OUTPUT_BUFFER_SIZE*sizeof(unsigned char));
-    // res = read(i2cFileDesc, &readBuffer, sizeof(readBuffer));
-    // if (res != sizeof(readBuffer)) {
-    //     perror("I2C: Unable to read from i2c register");
-    //     exit(1);
-    // }
-    // for (int i = 0; i < OUTPUT_BUFFER_SIZE; i++){
-    //     printf("register %d: %x\n", i, readBuffer[i]);
-    // }
-    // return readBuffer;
-
 
     unsigned char regAddr = OUT_X_L + 0x80;
     int res = write(i2cFileDesc, &regAddr, sizeof(regAddr));
@@ -209,9 +187,6 @@ unsigned char* accelerometer_readOutVals()
     Period_markEvent(PERIOD_EVENT_SAMPLE_ACCELEROMETER);
 
     memcpy(outputBuffer, readBuffer, sizeof(unsigned char) * (OUTPUT_BUFFER_SIZE));
-    // for (int i = 0; i < OUTPUT_BUFFER_SIZE; i++){
-    //     printf("register %d: %x = %d\n", i, readBuffer[i], readBuffer[i]);
-    // }
     return outputBuffer;
 }
 
