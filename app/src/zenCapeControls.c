@@ -7,7 +7,7 @@
 #define JOYSTICK_LEFT 3
 #define JOYSTICK_IN 4
 
-// TODO: fine-tune debounce timers
+// TODO: fine-tune debounce timers - do at the end
 #define JOYSTICK_DEBOUNCE_TIME 200
 #define ACCELEROMETER_BASS_DEBOUNCE_TIME 100
 #define ACCELEROMETER_HIHAT_DEBOUNCE_TIME 100
@@ -42,6 +42,7 @@ void zenCapeControls_cleanup(void)
     assert(is_initialized);
     isRunning = false;
     pthread_join(joyStickThreadId, NULL);
+    pthread_join(accelerometerThreadId, NULL);
     is_initialized = false;
 }
 

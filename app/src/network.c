@@ -2,7 +2,7 @@
 // Internal implementation for networking side of the light sampling application
 // Processes incoming udp packets and returns a reply based on the command received
 
-// TODO: implement interface commands
+// TODO: implement interface commands - do in tandem with webserver 4.0 section
 
 #include "network.h"
 #include <assert.h>

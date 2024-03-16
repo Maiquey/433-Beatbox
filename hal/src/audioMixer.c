@@ -136,6 +136,7 @@ void AudioMixer_readWaveFileIntoMemory(char *fileName, wavedata_t *pSound)
 				pSound->numSamples, fileName, samplesRead);
 		exit(EXIT_FAILURE);
 	}
+	fclose(file);
 }
 
 void AudioMixer_freeWaveFileData(wavedata_t *pSound)
@@ -301,6 +302,9 @@ static void fillPlaybackBuffer(short *buff, int size)
 			if (offset != -1){
 				int maxOffset = soundBites[i].pSound->numSamples; // get max offset
 				short* localpData = soundBites[i].pSound->pData;
+				if (localpData == NULL){
+					break;
+				}
 				for (int buffIdx = 0; buffIdx < size; buffIdx++){
 					if (offset == maxOffset){
 						offset = -1;
@@ -359,7 +363,7 @@ void* playbackThread()
 		}
 	}
 
-	return NULL;
+	pthread_exit(NULL);
 }
 
 Period_statistics_t* AudioMixer_getStats()

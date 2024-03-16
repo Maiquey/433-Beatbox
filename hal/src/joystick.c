@@ -177,7 +177,7 @@ void joystick_init(void)
 
 void joystick_cleanup(void)
 {
-	//TODO: does anything need to be done here? probably not.
+	//nothing needs to be freed
 }
 
 // Returns the ID of the joystick direction pressed according to the order specified at the top of this file
