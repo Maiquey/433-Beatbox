@@ -17,5 +17,9 @@ void drumBeat_cleanup(void);
 void drumBeat_cycleBeat(void);
 void drumBeat_adjustVolume(int increment);
 void drumBeat_adjustBPM(int increment);
+void drumBeat_playBass(void);
+void drumBeat_playHiHat(void);
+void drumBeat_playSoftSnare(void);
+void drumBeat_playHardSnare(void);
 
 #endif

@@ -16,5 +16,7 @@
 
 void accelerometer_init(void);
 void accelerometer_cleanup(void);
+// Returns dynamically allocated array of out values (must be freed by caller)
+unsigned char* accelerometer_readOutVals(void);
 
 #endif

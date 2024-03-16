@@ -140,3 +140,23 @@ void drumBeat_adjustBPM(int increment)
         BPM = newBPM;
     }
 }
+
+void drumBeat_playBass(void)
+{
+    AudioMixer_queueSound(&bass);
+}
+
+void drumBeat_playHiHat(void)
+{
+    AudioMixer_queueSound(&hiHat);
+}
+
+void drumBeat_playSoftSnare(void)
+{
+    AudioMixer_queueSound(&softSnare);
+}
+
+void drumBeat_playHardSnare(void)
+{
+    AudioMixer_queueSound(&hardSnare);
+}
