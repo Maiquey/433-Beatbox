@@ -45,7 +45,20 @@ $(document).ready(function() {
 		sendCommandViaUDP("stop");
 	});
 	
+});
+
+function sendCommandViaUDP(message) {
+	socket.emit('daUdpCommand', message);
+
+	var timeout = setTimeout(function() { //tiny bit of help from GPT here :)
+		var errMsg = "No response from back-end. Is NodeJS running on the target?";
+		console.log(errMsg);
+		$('#error-message').html(errMsg);
+		$('#error-box').css("display", "block");
+	}, 1000);
+
 	socket.on('commandReply', function(result) {
+		clearTimeout(timeout);
 		try {
 			//will only work when pulling data from app
 			var jsonObject = JSON.parse(result);
@@ -62,11 +75,25 @@ $(document).ready(function() {
 	});
 
 	socket.on('errorReply', function(result) {
+		clearTimeout(timeout);
 		$('#error-message').html(result);
 		$('#error-box').css("display", "block");
 	});
+};
+
+function sendRequest(file) {
+	console.log("Requesting '" + file + "'");
+	socket.emit('proc', file);
+
+	var timeout = setTimeout(function() { //tiny bit of help from GPT here :)
+		var errMsg = "No response from back-end. Is NodeJS running on the target?";
+		console.log(errMsg);
+		$('#error-message').html(errMsg);
+		$('#error-box').css("display", "block");
+	}, 1000);
 
 	socket.on('fileContents', function(result) {
+		clearTimeout(timeout);
 		var fileName = result.fileName;
 		var contents = result.contents;
 		// console.log(result);
@@ -85,16 +112,6 @@ $(document).ready(function() {
 		console.log(contents);
 		domObj.html(contents);
 	});
-	
-});
-
-function sendCommandViaUDP(message) {
-	socket.emit('daUdpCommand', message);
-};
-
-function sendRequest(file) {
-	console.log("Requesting '" + file + "'");
-	socket.emit('proc', file);
 }
 
 function replaceAll(str, find, replace) {
