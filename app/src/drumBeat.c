@@ -1,9 +1,9 @@
 #include "drumBeat.h"
 
-#define BASS_DRUM "wave-files/100051__menegass__gui-drum-bd-hard.wav"
-#define HI_HAT "wave-files/100053__menegass__gui-drum-cc.wav"
-#define HARD_SNARE "wave-files/100058__menegass__gui-drum-snare-hard.wav"
-#define SOFT_SNARE "wave-files/100059__menegass__gui-drum-snare-soft.wav"
+#define BASS_DRUM "beatbox-wav-files/100051__menegass__gui-drum-bd-hard.wav"
+#define HI_HAT "beatbox-wav-files/100053__menegass__gui-drum-cc.wav"
+#define HARD_SNARE "beatbox-wav-files/100058__menegass__gui-drum-snare-hard.wav"
+#define SOFT_SNARE "beatbox-wav-files/100059__menegass__gui-drum-snare-soft.wav"
 
 #define DEFAULT_BPM 120
 #define MIN_BPM 60
