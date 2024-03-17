@@ -1,0 +1,9 @@
+{
+	"name": "a3-node-server",
+	"version": "0.0.1",
+	"description": "Node webserver to accompany A3 beat_box program.",
+	"dependencies": {
+		"mime": "~1.2.7",
+		"socket.io": "~0.9.6"
+	}
+}
