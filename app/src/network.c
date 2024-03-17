@@ -137,7 +137,7 @@ static void processRx(char* messageRx, int bytesRx, struct sockaddr_in sinRemote
         snprintf(messageTx, MAX_LEN, "Program terminating.\n");
     }
     else{
-        snprintf(messageTx, MAX_LEN, "unknown command\n");
+        snprintf(messageTx, MAX_LEN, "unknown command: %s\n", messageRx);
     }
 
     sendto(socketDescriptor, messageTx, strlen(messageTx), 0, (struct sockaddr*) &sinRemote, sin_len);
