@@ -106,7 +106,6 @@ function sendRequest(file) {
 		$('#hours').html(hours);
 		$('#minutes').html(minutes);
 		$('#seconds').html(seconds);
-		$('#timeCheck').html(bbgUptime);
 	});
 }
 
