@@ -26,6 +26,8 @@ bool joystick_checkIfPressed(void);
 void joystick_waitForRelease(void);
 bool joystick_isPressedUpDown(void);
 bool joystick_isPressedLeftRight(void);
+bool joystick_isPressedLeftRight(void);
+bool joystick_isPressedIn(void);
 void joystick_cleanup(void);
 
 #endif

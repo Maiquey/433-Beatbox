@@ -47,6 +47,7 @@ void zenCapeControls_cleanup(void)
 static void* joystickInputThread()
 {
     long long debounceTimestamp = getTimeInMs();
+    bool isPressedIn = false;
     while(isRunning){
         if (getTimeInMs() - debounceTimestamp > JOYSTICK_DEBOUNCE_TIME){
             int joystickID = joystick_getJoyStickPress();
@@ -54,7 +55,9 @@ static void* joystickInputThread()
                 switch (joystickID) {
                     case JOYSTICK_IN:
                         // change beat
-                        drumBeat_cycleBeat();
+                        if(!isPressedIn){
+                            drumBeat_cycleBeat();
+                        }
                         break;
                     case JOYSTICK_UP:
                         // volume up by 5
@@ -75,6 +78,7 @@ static void* joystickInputThread()
                 }
                 debounceTimestamp = getTimeInMs();
             }
+            isPressedIn = joystick_isPressedIn(); // for stopping loop between modes
         }
         //sample joystick every 10s
         sleepForMs(10);

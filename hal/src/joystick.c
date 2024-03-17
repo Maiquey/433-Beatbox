@@ -264,12 +264,29 @@ bool joystick_isPressedUpDown(void){
 }
 
 // Check if LEFT/RIGHT being pressed
-bool joystick_isPressedLeftRight(void){
+bool joystick_isPressedLeftRight(void)
+{
 	for (int i = 0; i < NUM_DIRECTIONS; i++){
 		char buff[BUFF_SIZE];
 		int bytesRead = readLineFromFile(ValueFiles[i], buff, BUFF_SIZE);
 		if (bytesRead > 0) {
 			if (buff[0] == 48 && (i == JOYSTICK_LEFT || i == JOYSTICK_RIGHT)){ // 48 == '0' in ASCII
+				return true;
+			}
+		} else {
+			fprintf(stderr, "ERROR: Read 0 bytes from GPIO input: %s\n", strerror(errno));
+		}
+	}
+	return false;
+}
+
+bool joystick_isPressedIn(void)
+{
+	for (int i = 0; i < NUM_DIRECTIONS; i++){
+		char buff[BUFF_SIZE];
+		int bytesRead = readLineFromFile(ValueFiles[i], buff, BUFF_SIZE);
+		if (bytesRead > 0) {
+			if (buff[0] == 48 && (i == JOYSTICK_IN)){ // 48 == '0' in ASCII
 				return true;
 			}
 		} else {
