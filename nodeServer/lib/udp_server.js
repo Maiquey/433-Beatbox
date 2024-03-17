@@ -29,6 +29,14 @@ function handleCommand(socket) {
 		var buffer = new Buffer(data);
 
 		var client = dgram.createSocket('udp4');
+
+		var timeout = setTimeout(function() { //tiny bit of help from GPT here :)
+			var errMsg = "No response from beat-box application. Is it running?"
+			console.log(errMsg);
+			socket.emit('errorReply', errMsg);
+			client.close();
+		}, 1000);
+
 		client.send(buffer, 0, buffer.length, PORT, HOST, function(err, bytes) {
 			if (err) 
 				throw err;
@@ -45,17 +53,20 @@ function handleCommand(socket) {
 
 			var reply = message.toString('utf8')
 			socket.emit('commandReply', reply);
-
+			clearTimeout(timeout);
 			client.close();
 
 		});
 		client.on("UDP Client: close", function() {
 			console.log("closed");
+			clearTimeout(timeout);
 		});
 		client.on("UDP Client: error", function(err) {
+			clearTimeout(timeout);
 			console.log("error: ",err);
 		});
 	});
+				// socket.emit('errorReply', something);
 
 	socket.on('proc', function(fileName) {
 		// NOTE: Very unsafe? Why?

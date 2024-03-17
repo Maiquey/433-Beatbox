@@ -52,19 +52,18 @@ $(document).ready(function() {
 			var domObj_mode = $('#current-beat');
 			var domObj_volume = $('#volumeText');
 			var domObj_tempo = $('#tempoText');
-			// console.log(jsonObject.mode);
 			domObj_mode.html(jsonObject.mode);
 			domObj_volume.val(jsonObject.volume);
 			domObj_tempo.val(jsonObject.BPM);
 		} catch (error) {
 			console.log(result);
 		}
-		// console.log(result);
-		// var newDiv = $('<code></code>')
-		// 	.text(result)
-		// 	.wrapInner("<div></div>");
-		// $('#messages').append(newDiv);
-		// $('#messages').scrollTop($('#messages').prop('scrollHeight'));
+		$('#error-box').css("display", "none");
+	});
+
+	socket.on('errorReply', function(result) {
+		$('#error-message').html(result);
+		$('#error-box').css("display", "block");
 	});
 
 	socket.on('fileContents', function(result) {
