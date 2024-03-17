@@ -3,6 +3,8 @@
  * Respond to commands over a websocket to relay UDP commands to a local program
  */
 
+// Large portion adapted from udpServer example
+
 var fs   = require('fs');
 var socketio = require('socket.io');
 var io;
@@ -20,8 +22,8 @@ exports.listen = function(server) {
 
 function handleCommand(socket) {
 	// Pased string of comamnd to relay
-	socket.on('daUdpCommand', function(data) {
-		console.log('daUdpCommand command: ' + data);
+	socket.on('udpCommand', function(data) {
+		console.log('udpCommand command: ' + data);
 
 		// Info for connecting to the local process via UDP
 		var PORT = 12345;

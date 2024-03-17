@@ -48,7 +48,7 @@ $(document).ready(function() {
 });
 
 function sendCommandViaUDP(message) {
-	socket.emit('daUdpCommand', message);
+	socket.emit('udpCommand', message);
 
 	var timeout = setTimeout(function() { //tiny bit of help from GPT here :)
 		var errMsg = "No response from back-end. Is NodeJS running on the target?";

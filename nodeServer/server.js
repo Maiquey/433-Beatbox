@@ -3,7 +3,7 @@
 //
 // Launch server with:
 //   $ node server.js
-var PORT_NUMBER = 8042;
+var PORT_NUMBER = 8088;
 
 
 var http = require('http');
@@ -29,6 +29,7 @@ var server = http.createServer(function(request, response) {
 
 server.listen(PORT_NUMBER, function() {
 	console.log("Server listeneing on port " + PORT_NUMBER);
+	console.log("Connect via 192.168.7.2:" + PORT_NUMBER);
 });
 
 function serveStatic(response, absPath) {
@@ -65,6 +66,6 @@ function sendFile(response, filePath, fileContents) {
 /*
  * Create the Userver to listen for the websocket
  */
-var udpServer = require('./lib/udp_server');
-udpServer.listen(server);
+var backend = require('./lib/beat_box_server');
+backend.listen(server);
 
