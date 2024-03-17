@@ -96,21 +96,20 @@ function sendRequest(file) {
 		clearTimeout(timeout);
 		var fileName = result.fileName;
 		var contents = result.contents;
-		// console.log(result);
-		var domObj;
-		switch(fileName) {
-		case 'uptime':
-			domObj = $('#hours');
-			break;
-		default:
+		if (fileName != 'uptime'){
 			console.log("Unknown DOM object: " + fileName);
 			return;
 		}
-		// Make linefeeds into <br> tag.
-		console.log(contents);
-		contents = replaceAll(contents, "\n", "<br/>");
-		console.log(contents);
-		domObj.html(contents);
+		var uptimeVals = contents.split(" ");
+		var bbgUptime = parseInt(uptimeVals[0]);
+		var seconds = bbgUptime % 60;
+		var minutes = Math.floor(bbgUptime / 60);
+		var hours = Math.floor(minutes / 60);
+		minutes = minutes % 60;
+		$('#hours').html(hours);
+		$('#minutes').html(minutes);
+		$('#seconds').html(seconds);
+		$('#timeCheck').html(bbgUptime);
 	});
 }
 
