@@ -6,16 +6,37 @@ var socket = io.connect();
 $(document).ready(function() {
 
 	$('#btnBeat0').click(function(){
-		sendCommandViaUDP("help");
+		sendCommandViaUDP("beat0");
 	});
 	$('#btnBeat1').click(function(){
-		sendCommandViaUDP("?");
+		sendCommandViaUDP("beat1");
 	});
 	$('#btnBeat2').click(function(){
-		sendCommandViaUDP("length");
+		sendCommandViaUDP("beat2");
 	});
-	$('#btnHistory').click(function(){
-		sendCommandViaUDP("history");
+	$('#btnVolMinus').click(function(){
+		sendCommandViaUDP("vol-down");
+	});
+	$('#btnVolPlus').click(function(){
+		sendCommandViaUDP("vol-up");
+	});
+	$('#btnTempoMinus').click(function(){
+		sendCommandViaUDP("bpm-down");
+	});
+	$('#btnTempoPlus').click(function(){
+		sendCommandViaUDP("bpm-up");
+	});
+	$('#btnBass').click(function(){
+		sendCommandViaUDP("bass");
+	});
+	$('#btnHiHat').click(function(){
+		sendCommandViaUDP("hihat");
+	});
+	$('#btnSoftSnare').click(function(){
+		sendCommandViaUDP("softsnare");
+	});
+	$('#btnHardSnare').click(function(){
+		sendCommandViaUDP("hardsnare");
 	});
 	$('#btnTerminate').click(function(){
 		sendCommandViaUDP("stop");
