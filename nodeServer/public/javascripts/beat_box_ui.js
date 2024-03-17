@@ -52,7 +52,6 @@ function sendCommandViaUDP(message) {
 
 	var timeout = setTimeout(function() { //tiny bit of help from GPT here :)
 		var errMsg = "No response from back-end. Is NodeJS running on the target?";
-		console.log(errMsg);
 		$('#error-message').html(errMsg);
 		$('#error-box').css("display", "block");
 	}, 1000);
@@ -69,7 +68,7 @@ function sendCommandViaUDP(message) {
 			domObj_volume.val(jsonObject.volume);
 			domObj_tempo.val(jsonObject.BPM);
 		} catch (error) {
-			console.log(result);
+			// console.log(result);
 		}
 		$('#error-box').css("display", "none");
 	});
@@ -82,12 +81,10 @@ function sendCommandViaUDP(message) {
 };
 
 function sendRequest(file) {
-	console.log("Requesting '" + file + "'");
 	socket.emit('proc', file);
 
 	var timeout = setTimeout(function() { //tiny bit of help from GPT here :)
 		var errMsg = "No response from back-end. Is NodeJS running on the target?";
-		console.log(errMsg);
 		$('#error-message').html(errMsg);
 		$('#error-box').css("display", "block");
 	}, 1000);
@@ -97,7 +94,7 @@ function sendRequest(file) {
 		var fileName = result.fileName;
 		var contents = result.contents;
 		if (fileName != 'uptime'){
-			console.log("Unknown DOM object: " + fileName);
+			// console.log("Unknown DOM object: " + fileName);
 			return;
 		}
 		var uptimeVals = contents.split(" ");

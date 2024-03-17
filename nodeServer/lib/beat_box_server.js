@@ -23,7 +23,6 @@ exports.listen = function(server) {
 function handleCommand(socket) {
 	// Pased string of comamnd to relay
 	socket.on('udpCommand', function(data) {
-		console.log('udpCommand command: ' + data);
 
 		// Info for connecting to the local process via UDP
 		var PORT = 12345;
@@ -34,7 +33,6 @@ function handleCommand(socket) {
 
 		var timeout = setTimeout(function() { //tiny bit of help from GPT here :)
 			var errMsg = "No response from beat-box application. Is it running?"
-			console.log(errMsg);
 			socket.emit('errorReply', errMsg);
 			client.close();
 		}, 1000);
@@ -42,16 +40,13 @@ function handleCommand(socket) {
 		client.send(buffer, 0, buffer.length, PORT, HOST, function(err, bytes) {
 			if (err) 
 				throw err;
-			console.log('UDP message sent to ' + HOST +':'+ PORT);
 		});
 
 		client.on('listening', function () {
 			var address = client.address();
-			console.log('UDP Client: listening on ' + address.address + ":" + address.port);
 		});
 		// Handle an incoming message over the UDP from the local application.
 		client.on('message', function (message, remote) {
-			console.log("UDP Client: message Rx" + remote.address + ':' + remote.port +' - ' + message);
 
 			var reply = message.toString('utf8')
 			socket.emit('commandReply', reply);
@@ -74,7 +69,6 @@ function handleCommand(socket) {
 		// NOTE: Very unsafe? Why?
 		// Hint: think of ../
 		var absPath = "/proc/" + fileName;
-		console.log('accessing ' + absPath);
 		
 		fs.exists(absPath, function(exists) {
 			if (exists) {
