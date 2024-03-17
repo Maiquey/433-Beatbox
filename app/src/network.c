@@ -15,7 +15,6 @@
 #include <string.h>
 #include "drumBeat.h"
 
-#define HELP_MSG "\nAccepted command examples:\ncount      -- get the total number of samples taken.\nlength     -- get the number of samples taken in the previously completed second.\ndips       -- get the number of dips in the previously completed second.\nhistory    -- get all the samples in the previously completed second.\nstop       -- cause the server program to end.\n<enter>    -- repeat last command.\n"
 #define MAX_LEN 1500
 #define MAX_WRITABLE_HISTORY 1470 //max number of bytes that can be sent for history without causing a line break
 #define PORT 12345
@@ -90,41 +89,50 @@ static void processRx(char* messageRx, int bytesRx, struct sockaddr_in sinRemote
     if (!firstMessage && bytesRx == 1 && messageRx[0]){
         messageRx = lastMessage;
     }
-    if (strncmp(messageRx, "help", strlen("help")) == 0 || strncmp(messageRx, "?", strlen("?")) == 0){
-        snprintf(messageTx, MAX_LEN, HELP_MSG);
+    if (strncmp(messageRx, "beat0", strlen("beat0")) == 0){
+        drumBeat_setBeat(0);
+        snprintf(messageTx, MAX_LEN, "Switching to None.\n");
     }
-    // else if (strncmp(messageRx, "count", strlen("count")) == 0){
-    //     // snprintf(messageTx, MAX_LEN, "# samples taken total: %lld\n", Sampler_getNumSamplesTaken());
-    // }
-    // else if (strncmp(messageRx, "length", strlen("length")) == 0){
-    //     // snprintf(messageTx, MAX_LEN, "# samples taken last second: %d\n", Sampler_getHistorySize());
-    // }
-    // else if (strncmp(messageRx, "dips", strlen("dips")) == 0){
-    //     // snprintf(messageTx, MAX_LEN, "# Dips: %d\n", Sampler_getHistoryNumDips());
-    // }
-    // else if (strncmp(messageRx, "history", strlen("history")) == 0){
-    //     // pthread_mutex_lock(sampleHistoryMutex);
-    //     // int historySize = Sampler_getHistorySize();
-    //     // double* history = Sampler_getHistory(&historySize);
-    //     // pthread_mutex_unlock(sampleHistoryMutex);
-    //     // int offset = 0;
-    //     // int bytesWritten = 0;
-    //     // for (int i = 0; i < historySize; i++){
-    //     //     if ((i+1) % 10 == 0 || i == historySize - 1){
-    //     //         bytesWritten = snprintf(messageTx + offset, MAX_LEN - offset, "%.3f,\n", history[i]);
-    //     //     } else {
-    //     //         bytesWritten = snprintf(messageTx + offset, MAX_LEN - offset, "%.3f, ", history[i]);
-    //     //     }
-    //     //     offset += bytesWritten;
-    //     //     if (offset == MAX_WRITABLE_HISTORY){
-    //     //         sendto(socketDescriptor, messageTx, strlen(messageTx), 0, (struct sockaddr*) &sinRemote, sin_len);
-    //     //         memset(messageTx, 0, sizeof(messageTx));
-    //     //         offset = 0;
-    //     //         bytesWritten = 0;
-    //     //     }
-    //     // }
-    //     // free(history);
-    // }
+    else if (strncmp(messageRx, "beat1", strlen("beat1")) == 0){
+        drumBeat_setBeat(1);
+        snprintf(messageTx, MAX_LEN, "Switching to Rock Beat.\n");
+    }
+    else if (strncmp(messageRx, "beat2", strlen("beat2")) == 0){
+        drumBeat_setBeat(2);
+        snprintf(messageTx, MAX_LEN, "Switching to Half-Time Shuffle.\n");
+    }
+    else if (strncmp(messageRx, "vol-down", strlen("vol-down")) == 0){
+        drumBeat_adjustVolume(-5);
+        snprintf(messageTx, MAX_LEN, "Lowering Volume.\n");
+    }
+    else if (strncmp(messageRx, "vol-up", strlen("vol-up")) == 0){
+        drumBeat_adjustVolume(5);
+        snprintf(messageTx, MAX_LEN, "Raising Volume.\n");
+    }
+    else if (strncmp(messageRx, "bpm-down", strlen("bpm-down")) == 0){
+        drumBeat_adjustBPM(-5);
+        snprintf(messageTx, MAX_LEN, "Decreasing BPM.\n");
+    }
+    else if (strncmp(messageRx, "bpm-up", strlen("bpm-up")) == 0){
+        drumBeat_adjustBPM(5);
+        snprintf(messageTx, MAX_LEN, "Increasing BPM.\n");
+    }
+    else if (strncmp(messageRx, "bass", strlen("bass")) == 0){
+        drumBeat_playBass();
+        snprintf(messageTx, MAX_LEN, "Playing Bass Drum.\n");
+    }
+    else if (strncmp(messageRx, "hihat", strlen("hihat")) == 0){
+        drumBeat_playHiHat();
+        snprintf(messageTx, MAX_LEN, "Playing Hi-Hat.\n");
+    }
+    else if (strncmp(messageRx, "softsnare", strlen("softsnare")) == 0){
+        drumBeat_playSoftSnare();
+        snprintf(messageTx, MAX_LEN, "Playing Soft Snare.\n");
+    }
+    else if (strncmp(messageRx, "hardsnare", strlen("hardsnare")) == 0){
+        drumBeat_playHardSnare();
+        snprintf(messageTx, MAX_LEN, "Playing Hard Snare.\n");
+    }
     else if (strncmp(messageRx, "stop", strlen("stop")) == 0){
         snprintf(messageTx, MAX_LEN, "Program terminating.\n");
     }

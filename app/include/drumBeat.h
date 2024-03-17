@@ -22,5 +22,6 @@ void drumBeat_playBass(void);
 void drumBeat_playHiHat(void);
 void drumBeat_playSoftSnare(void);
 void drumBeat_playHardSnare(void);
+void drumBeat_setBeat(int beatId);
 
 #endif

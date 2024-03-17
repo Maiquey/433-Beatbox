@@ -165,3 +165,8 @@ void drumBeat_playHardSnare(void)
 {
     AudioMixer_queueSound(&hardSnare);
 }
+
+void drumBeat_setBeat(int newBeatID)
+{
+    beatID = newBeatID;
+}
