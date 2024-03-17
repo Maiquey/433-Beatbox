@@ -8,6 +8,8 @@
         "joystick.h": "c",
         "alloca.h": "c",
         "periodtimer.h": "c",
-        "asoundlib.h": "c"
+        "asoundlib.h": "c",
+        "ioctl.h": "c",
+        "stdio.h": "c"
     }
 }

@@ -2,23 +2,10 @@
 
 #define I2CDRV_LINUX_BUS1 "/dev/i2c-1"
 
-#define LEFT_DIGIT_GPIO_PATH "/sys/class/gpio/gpio61/"
-#define RIGHT_DIGIT_GPIO_PATH "/sys/class/gpio/gpio44/"
-
-#define LEFT_VALUE LEFT_DIGIT_GPIO_PATH "value"
-#define LEFT_DIRECTION LEFT_DIGIT_GPIO_PATH "direction"
-#define RIGHT_VALUE RIGHT_DIGIT_GPIO_PATH "value"
-#define RIGHT_DIRECTION RIGHT_DIGIT_GPIO_PATH "direction"
-
 #define I2C_DEVICE_ADDRESS 0x18
 
 #define CTRL_REG1 0x20
-#define OUT_X_L 0x28
-#define OUT_X_H 0x29
-#define OUT_Y_L 0x2A
-#define OUT_Y_H 0x2B
-#define OUT_Z_L 0x2C
-#define OUT_Z_H 0x2D
+#define OUT_FIRST_BYTE 0x28
 
 #define OUTPUT_BUFFER_SIZE 6
 
@@ -39,24 +26,6 @@ static int initI2cBus(char* bus, int address)
     }
     return i2cFileDesc;
 }
-
-// static unsigned char readI2cReg(int i2cFileDesc, unsigned char regAddr)
-// {
-//     // To read a register, must first write the address
-//     int res = write(i2cFileDesc, &regAddr, sizeof(regAddr));
-//     if (res != sizeof(regAddr)) {
-//         perror("I2C: Unable to write to i2c register.");
-//         exit(1);
-//     }
-//     // Now read the value and return it
-//     char value = 0;
-//     res = read(i2cFileDesc, &value, sizeof(value));
-//     if (res != sizeof(value)) {
-//         perror("I2C: Unable to read from i2c register");
-//         exit(1);
-//     }
-//     return value;
-// }
 
 static void writeI2cReg(int i2cFileDesc, unsigned char regAddr, unsigned char value)
 {
@@ -92,21 +61,6 @@ static void runCommand(char* command)
     }
 }
 
-// static void writeToFile(const char* filePath, const char* input)
-// {
-//     FILE *f = fopen(filePath, "w");
-//     if (!f) {
-//         printf("ERROR: Unable to file.\n");
-//         exit(-1);
-//     }
-//     int charWritten = fprintf(f, "%s", input);
-//     if (charWritten <= 0) {
-//         printf("ERROR WRITING DATA");
-//         exit(1);
-//     }
-//     fclose(f);
-// }
-
 void accelerometer_init(void)
 {
     assert(!is_initialized);
@@ -118,41 +72,6 @@ void accelerometer_init(void)
     i2cFileDesc = initI2cBus(I2CDRV_LINUX_BUS1, I2C_DEVICE_ADDRESS);
     writeI2cReg(i2cFileDesc, CTRL_REG1, 0x27); // set power mode to 1
     pStats = (Period_statistics_t*)malloc(sizeof(Period_statistics_t));
-    // writeI2cReg(i2cFileDesc, REG_DIRB, 0x00);
-    // unsigned char whoAmI = readI2cReg(i2cFileDesc, 0x0F);
-    // printf("who am I? %x.\n", whoAmI);
-    // char reg = (char)readI2cReg(i2cFileDesc, OUT_X_L);
-    // printf("OUT_X_L? %x.\n", reg);
-    // reg = (char)readI2cReg(i2cFileDesc, OUT_X_H);
-    // printf("OUT_X_H? %x.\n", reg);
-    // reg = (char)readI2cReg(i2cFileDesc, OUT_Y_L);
-    // printf("OUT_Y_L? %x.\n", reg);
-    // reg = (char)readI2cReg(i2cFileDesc, OUT_Y_H);
-    // printf("OUT_Y_H? %x.\n", reg);
-    // reg = (char)readI2cReg(i2cFileDesc, OUT_Z_L);
-    // printf("OUT_Z_L? %x.\n", reg);
-    // reg = (char)readI2cReg(i2cFileDesc, OUT_Z_H);
-    // printf("OUT_Z_H? %x.\n", reg);
-
-    // unsigned char regAddr = OUT_X_L + 0x80;
-    // int res = write(i2cFileDesc, &regAddr, sizeof(regAddr));
-    // if (res != sizeof(regAddr)) {
-    //     perror("I2C: Unable to write i2c register.");
-    //     exit(1);
-    // }
-
-    // // Now read the value and return it
-    // // unsigned char* readBufferMalloc = (unsigned char*)malloc(OUTPUT_BUFFER_SIZE*sizeof(unsigned char));
-    // signed char readBuffer[OUTPUT_BUFFER_SIZE] = {0};
-    // res = read(i2cFileDesc, &readBuffer, OUTPUT_BUFFER_SIZE);
-    // if (res != OUTPUT_BUFFER_SIZE) {
-    //     perror("I2C: Unable to read from i2c registers");
-    //     exit(1);
-    // }
-    // for (int i = 0; i < OUTPUT_BUFFER_SIZE; i++){
-    //     printf("register %d: %x = %d\n", i, readBuffer[i], readBuffer[i]);
-    // }
-    // free(readBuffer);
 
 }
 
@@ -165,17 +84,19 @@ void accelerometer_cleanup(void)
     close(i2cFileDesc);
 }
 
+// Reads output bytes in a single stream and returns a byte array
 unsigned char* accelerometer_readOutVals()
 {
-
-    unsigned char regAddr = OUT_X_L + 0x80;
+    assert(is_initialized);
+    // Must write to the register first to read it
+    unsigned char regAddr = OUT_FIRST_BYTE + 0x80;
     int res = write(i2cFileDesc, &regAddr, sizeof(regAddr));
     if (res != sizeof(regAddr)) {
         perror("I2C: Unable to write i2c register.");
         exit(1);
     }
 
-    // Now read the value and return it
+    // Now read the whole stream of bytes and return it
     unsigned char* outputBuffer = (unsigned char*)malloc(OUTPUT_BUFFER_SIZE*sizeof(unsigned char));
     unsigned char readBuffer[OUTPUT_BUFFER_SIZE] = {0};
     res = read(i2cFileDesc, &readBuffer, OUTPUT_BUFFER_SIZE);
@@ -186,6 +107,7 @@ unsigned char* accelerometer_readOutVals()
 
     Period_markEvent(PERIOD_EVENT_SAMPLE_ACCELEROMETER);
 
+    //memcpy required since read() was not happy working with a malloced array
     memcpy(outputBuffer, readBuffer, sizeof(unsigned char) * (OUTPUT_BUFFER_SIZE));
     return outputBuffer;
 }

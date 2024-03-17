@@ -302,24 +302,24 @@ static void fillPlaybackBuffer(short *buff, int size)
 			if (offset != -1){
 				int maxOffset = soundBites[i].pSound->numSamples; // get max offset
 				short* localpData = soundBites[i].pSound->pData;
-				if (localpData == NULL){
+				if (localpData == NULL){ // guard for when sound bites are freed by higher-level module but loop still running
 					break;
 				}
-				for (int buffIdx = 0; buffIdx < size; buffIdx++){
-					if (offset == maxOffset){
-						offset = -1;
+				for (int buffIdx = 0; buffIdx < size; buffIdx++){ // loop through enough samples to fill the buffer
+					if (offset == maxOffset){ // if reached end of samples 
+						offset = -1; //indicate this sound bite can be used by something else
 						break;
 					}
-					int pcmData = (int)buff[buffIdx] + (int)localpData[offset];
-					if (pcmData > SHRT_MAX){
-						pcmData = SHRT_MAX;
-					} else if (pcmData < SHRT_MIN) {
-						pcmData = SHRT_MIN;
+					int pwmData = (int)buff[buffIdx] + (int)localpData[offset]; //superimpose pwm data
+					if (pwmData > SHRT_MAX){
+						pwmData = SHRT_MAX;
+					} else if (pwmData < SHRT_MIN) {
+						pwmData = SHRT_MIN;
 					}
-					buff[buffIdx] = (short)pcmData;
+					buff[buffIdx] = (short)pwmData;
 					offset++;
 				}
-				soundBites[i].location = offset;
+				soundBites[i].location = offset; // update soundbite
 			}
 		}
 	}

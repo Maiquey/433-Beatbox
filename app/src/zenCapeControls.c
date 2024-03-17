@@ -7,7 +7,6 @@
 #define JOYSTICK_LEFT 3
 #define JOYSTICK_IN 4
 
-// TODO: fine-tune debounce timers - do at the end (Calculat what 1G is, divide each reading by that value)
 #define JOYSTICK_DEBOUNCE_TIME 200
 #define ACCELEROMETER_BASS_DEBOUNCE_TIME 100
 #define ACCELEROMETER_HIHAT_DEBOUNCE_TIME 100
@@ -44,6 +43,7 @@ void zenCapeControls_cleanup(void)
     is_initialized = false;
 }
 
+// Thread to sample joystick input
 static void* joystickInputThread()
 {
     long long debounceTimestamp = getTimeInMs();
@@ -82,6 +82,7 @@ static void* joystickInputThread()
     pthread_exit(NULL);
 }
 
+// Thread to sample accelerometer values
 static void* accelerometerSamplingThread()
 {
     // X normal range = {176, 352}
@@ -105,6 +106,12 @@ static void* accelerometerSamplingThread()
         int16_t y_data = y_data_p / Y_G_DIVISOR;
         int16_t z_data = z_data_p / Z_G_DIVISOR;
         
+        //Algorithm: Baseline G's for X and Y direction is 0, Z is 1
+        //    If the last reading on X or Y was lower G value at zero, and current reading is baseline or above, trigger a sound
+        //    Similar case for Z direction just reversed
+        //    G calculations for X and Y have been adjusted as it's a bit harder to generate 1 full G for them as opposed to Z
+        //    Essentially -1 G's for X or Y will generate a hi-hat/snare and 2G's for Z will generate bass drum
+        //    X and Y are calculated on negative G values simply based on the direction - as shown in Dr. Brian's video demonstration
         if ((getTimeInMs() - debounceTimerHiHat > ACCELEROMETER_HIHAT_DEBOUNCE_TIME) 
             && x_last < 0 
             && x_data >= 0){
@@ -127,8 +134,7 @@ static void* accelerometerSamplingThread()
         y_last = y_data;
         z_last = z_data;
         free(accelerometerOutput);
-        // printf("%d - {%d / %d}\n", z_data, z_data_p, Z_G_DIVISOR);
-        sleepForMs(10);
+        sleepForMs(10); // sample every 10ms
     }
     pthread_exit(NULL);
 }

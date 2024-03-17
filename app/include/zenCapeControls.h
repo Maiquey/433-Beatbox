@@ -1,6 +1,6 @@
-// Sample application module
-// Normally, you might create a module such as this for each module in
-// the application that does some high-level task; perhaps has its own thread.
+// High-level module for sampling user input on the zen cape
+// spawns two threads to continuously monitor and sample the joystick and accelerometer
+// calls the necessary functions from drumBeat interface when certain events triggered
 
 #ifndef _ZENCAPE_CONTROLS_H_
 #define _ZENCAPE_CONTROLS_H_

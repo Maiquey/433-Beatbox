@@ -23,13 +23,14 @@
 #define JOYSTICK_RIGHT 1
 #define JOYSTICK_DOWN 2
 #define JOYSTICK_LEFT 3
-#define TIMEOUT_CODE 4
+#define JOYSTICK_IN 4
+#define TIMEOUT_CODE 5
 #define ERROR_CODE -1
 #define BUFF_SIZE 1024
 #define INDEFINITE_TIMEOUT -1
 
-// Lists for looping through different files for all 4 joystick directions
-// Always in the order Up->Right->Down->Left
+// Lists for looping through different files for all 5 joystick directions
+// Always in the order Up->Right->Down->Left->In
 
 const char* DirectionFiles[NUM_DIRECTIONS] = {
     JSUP_DIRECTION,

@@ -1,6 +1,6 @@
-// Sample application module
-// Normally, you might create a module such as this for each module in
-// the application that does some high-level task; perhaps has its own thread.
+// high-level drumBeat module
+// communicates with the audioMixer hal module to queue sounds into a drumbeat
+// acts as central interface into audio hal for this project
 
 #ifndef _DRUMBEAT_H_
 #define _DRUMBEAT_H_

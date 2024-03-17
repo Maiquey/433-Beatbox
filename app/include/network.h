@@ -1,6 +1,6 @@
 // network.h
 // Module to handle incoming udp packets and reply based on user commands
-// supports commands including help/?, count, length, dips, <enter>, stop
+// supports commands coming in from the NodeJS webserver hosted on bbg
 
 #ifndef _NETWORK_H_
 #define _NETWORK_H_

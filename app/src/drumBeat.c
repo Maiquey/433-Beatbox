@@ -8,8 +8,8 @@
 #define DEFAULT_BPM 120
 #define MIN_BPM 60
 #define MAX_BPM 200
-#define EIGHTH_NOTE_LENGTH_NUM 30000
-#define QUARTER_NOTE_LENGTH_NUM 60000
+#define EIGHTH_NOTE_LENGTH_NUM 30000    // Calculation for eighth note = 30000 / BPM (in ms)
+#define QUARTER_NOTE_LENGTH_NUM 60000   // Calculation for quarter note = 60000 / BPM (in ms)
 #define DEFAULT_BEAT_ID 1
 #define NUM_BEATS 3
 
@@ -20,10 +20,6 @@ static wavedata_t softSnare;
 
 static int BPM = 120;
 static int beatID = DEFAULT_BEAT_ID;
-// Calculation for quarter note = 60000 / BPM (in ms)
-// Calculation for eighth note = 30000 / BPM (in ms)
-
-static int currentBeat = 0;
 
 static void* drumMachineThread();
 static void* textDisplayThread();
@@ -32,6 +28,7 @@ static pthread_t statsThreadId;
 static bool is_initialized = false;
 
 static bool isRunning = false;
+
 void drumBeat_init(void)
 {
     assert(!is_initialized);
@@ -45,13 +42,14 @@ void drumBeat_init(void)
     is_initialized = true;
     pthread_create(&drumThreadId, NULL, drumMachineThread, NULL);
     pthread_create(&statsThreadId, NULL, textDisplayThread, NULL);
-
     
 }
 
+// continuously generate a drum beat depending on selected beatID
 static void* drumMachineThread()
 {
     assert(is_initialized);
+    int currentBeat = 0;
     while (isRunning){
         currentBeat = currentBeat % 4;
         switch (beatID){
@@ -93,11 +91,14 @@ static void* drumMachineThread()
     pthread_exit(NULL);
 }
 
+// Thread which prints program info to console once every second
 static void* textDisplayThread()
 {
     assert(is_initialized);
+    //clear transient period
     AudioMixer_getStats();
     accelerometer_getStats();
+    //start sampling
     while (isRunning){
         sleepForMs(1000);
         Period_statistics_t* audioStats = AudioMixer_getStats();
@@ -171,6 +172,7 @@ void drumBeat_setBeat(int newBeatID)
     beatID = newBeatID;
 }
 
+// returns name of currently selected beat for web API
 char* drumBeat_getDrumBeatName(void)
 {
     switch (beatID){

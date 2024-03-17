@@ -1,8 +1,9 @@
+// Accelerometer module
+// initializes accelerometer and allows reading output registers
 #ifndef _ACCELEROMETER_H_
 #define _ACCELEROMETER_H_
 
 #include "hal/timing.h"
-// #include "hal/audioMixer.h"
 #include "hal/periodTimer.h"
 #include <assert.h>
 #include <stdio.h>
