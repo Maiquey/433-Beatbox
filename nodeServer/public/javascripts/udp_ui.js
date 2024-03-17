@@ -54,8 +54,8 @@ $(document).ready(function() {
 			var domObj_tempo = $('#tempoText');
 			// console.log(jsonObject.mode);
 			domObj_mode.html(jsonObject.mode);
-			domObj_volume.html(jsonObject.volume);
-			domObj_tempo.html(jsonObject.BPM);
+			domObj_volume.val(jsonObject.volume);
+			domObj_tempo.val(jsonObject.BPM);
 		} catch (error) {
 			console.log(result);
 		}

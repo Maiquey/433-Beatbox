@@ -132,7 +132,7 @@ static void processRx(char* messageRx, int bytesRx, struct sockaddr_in sinRemote
         snprintf(messageTx, MAX_LEN, "Playing Hard Snare.\n");
     }
     else if (strncmp(messageRx, "getInfo", strlen("getInfo")) == 0){
-        snprintf(messageTx, MAX_LEN, "{\"mode\":\"rock beat\",\"volume\":\"100\",\"BPM\":\"120\"}");
+        snprintf(messageTx, MAX_LEN, "{\"mode\":\"%s\",\"volume\":\"%d\",\"BPM\":\"%d\"}", drumBeat_getDrumBeatName(), AudioMixer_getVolume(), drumBeat_getBPM());
     }
     else if (strncmp(messageRx, "stop", strlen("stop")) == 0){
         snprintf(messageTx, MAX_LEN, "Program terminating.\n");

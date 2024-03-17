@@ -170,3 +170,21 @@ void drumBeat_setBeat(int newBeatID)
 {
     beatID = newBeatID;
 }
+
+char* drumBeat_getDrumBeatName(void)
+{
+    switch (beatID){
+        case (0):
+            return "None";
+        case (1):
+            return "Rock Beat";
+        case (2):
+            return "Half-time Shuffle";
+        default:
+            return "ERROR";
+    }
+}
+
+int drumBeat_getBPM(void){
+    return BPM;
+}
