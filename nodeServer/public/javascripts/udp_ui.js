@@ -5,6 +5,9 @@
 var socket = io.connect();
 $(document).ready(function() {
 
+	window.setInterval(function() {sendRequest('uptime')}, 1000);
+	window.setInterval(function() {sendCommandViaUDP("getInfo");}, 1000);
+
 	$('#btnBeat0').click(function(){
 		sendCommandViaUDP("beat0");
 	});
@@ -43,12 +46,45 @@ $(document).ready(function() {
 	});
 	
 	socket.on('commandReply', function(result) {
-		console.log(result);
+		try {
+			//will only work when pulling data from app
+			var jsonObject = JSON.parse(result);
+			var domObj_mode = $('#current-beat');
+			var domObj_volume = $('#volumeText');
+			var domObj_tempo = $('#tempoText');
+			// console.log(jsonObject.mode);
+			domObj_mode.html(jsonObject.mode);
+			domObj_volume.html(jsonObject.volume);
+			domObj_tempo.html(jsonObject.BPM);
+		} catch (error) {
+			console.log(result);
+		}
+		// console.log(result);
 		// var newDiv = $('<code></code>')
 		// 	.text(result)
 		// 	.wrapInner("<div></div>");
 		// $('#messages').append(newDiv);
 		// $('#messages').scrollTop($('#messages').prop('scrollHeight'));
+	});
+
+	socket.on('fileContents', function(result) {
+		var fileName = result.fileName;
+		var contents = result.contents;
+		// console.log(result);
+		var domObj;
+		switch(fileName) {
+		case 'uptime':
+			domObj = $('#hours');
+			break;
+		default:
+			console.log("Unknown DOM object: " + fileName);
+			return;
+		}
+		// Make linefeeds into <br> tag.
+		console.log(contents);
+		contents = replaceAll(contents, "\n", "<br/>");
+		console.log(contents);
+		domObj.html(contents);
 	});
 	
 });
@@ -56,3 +92,12 @@ $(document).ready(function() {
 function sendCommandViaUDP(message) {
 	socket.emit('daUdpCommand', message);
 };
+
+function sendRequest(file) {
+	console.log("Requesting '" + file + "'");
+	socket.emit('proc', file);
+}
+
+function replaceAll(str, find, replace) {
+	return str.replace(new RegExp(find, 'g'), replace);
+}

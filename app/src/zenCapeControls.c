@@ -7,7 +7,7 @@
 #define JOYSTICK_LEFT 3
 #define JOYSTICK_IN 4
 
-// TODO: fine-tune debounce timers - do at the end
+// TODO: fine-tune debounce timers - do at the end (Calculat what 1G is, divide each reading by that value)
 #define JOYSTICK_DEBOUNCE_TIME 200
 #define ACCELEROMETER_BASS_DEBOUNCE_TIME 100
 #define ACCELEROMETER_HIHAT_DEBOUNCE_TIME 100

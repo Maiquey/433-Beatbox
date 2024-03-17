@@ -2,8 +2,6 @@
 // Internal implementation for networking side of the light sampling application
 // Processes incoming udp packets and returns a reply based on the command received
 
-// TODO: implement interface commands - do in tandem with webserver 4.0 section
-
 #include "network.h"
 #include <assert.h>
 #include <stdio.h>
@@ -133,6 +131,9 @@ static void processRx(char* messageRx, int bytesRx, struct sockaddr_in sinRemote
         drumBeat_playHardSnare();
         snprintf(messageTx, MAX_LEN, "Playing Hard Snare.\n");
     }
+    else if (strncmp(messageRx, "getInfo", strlen("getInfo")) == 0){
+        snprintf(messageTx, MAX_LEN, "{\"mode\":\"rock beat\",\"volume\":\"100\",\"BPM\":\"120\"}");
+    }
     else if (strncmp(messageRx, "stop", strlen("stop")) == 0){
         snprintf(messageTx, MAX_LEN, "Program terminating.\n");
     }
@@ -142,7 +143,6 @@ static void processRx(char* messageRx, int bytesRx, struct sockaddr_in sinRemote
 
     sendto(socketDescriptor, messageTx, strlen(messageTx), 0, (struct sockaddr*) &sinRemote, sin_len);
     if (strncmp(messageRx, "stop", strlen("stop")) == 0){
-        printf("supposedly stopping\n");
         pthread_cond_signal(mainCondVar);
         isRunning = false;
     }
