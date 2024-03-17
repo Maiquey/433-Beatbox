@@ -5,28 +5,29 @@
 var socket = io.connect();
 $(document).ready(function() {
 
-	$('#btnHelp').click(function(){
+	$('#btnBeat0').click(function(){
 		sendCommandViaUDP("help");
 	});
-	$('#btnCount').click(function(){
-		sendCommandViaUDP("count");
+	$('#btnBeat1').click(function(){
+		sendCommandViaUDP("?");
 	});
-	$('#btnLength').click(function(){
+	$('#btnBeat2').click(function(){
 		sendCommandViaUDP("length");
 	});
 	$('#btnHistory').click(function(){
 		sendCommandViaUDP("history");
 	});
-	$('#btnStop').click(function(){
+	$('#btnTerminate').click(function(){
 		sendCommandViaUDP("stop");
 	});
 	
 	socket.on('commandReply', function(result) {
-		var newDiv = $('<code></code>')
-			.text(result)
-			.wrapInner("<div></div>");
-		$('#messages').append(newDiv);
-		$('#messages').scrollTop($('#messages').prop('scrollHeight'));
+		console.log(result);
+		// var newDiv = $('<code></code>')
+		// 	.text(result)
+		// 	.wrapInner("<div></div>");
+		// $('#messages').append(newDiv);
+		// $('#messages').scrollTop($('#messages').prop('scrollHeight'));
 	});
 	
 });

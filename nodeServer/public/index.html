@@ -1,22 +1,50 @@
 <!DOCTYPE html>
 <html lang='en'>
 <head>
-	<title>Demo Node.js to C App via UDP</title>
+	<title>BeagleBone Beat-Box</title>
 	<link rel='stylesheet' href='/stylesheets/style.css'></link>
 </head>
 
 <body>
 	<div id='content'>
-		<h1>Node.js to C App via UDP</h1>
-		<div id='messages'></div>
-		
-		<!-- <form id='send-form' >
-			<input type="button" id="btnHelp" value="Help"/>
-			<input type="button" id="btnCount" value="Count Sorted"/>
-			<input type="button" id="btnLength" value="Length"/>
-			<input type="button" id="btnHistory"  value="Get Data"/>
-			<input type="button" id="btnStop"  value="Stop App"/>
-		</form> -->
+		<h1>BeagleBone Beat-Box</h1>
+		<p>by Jan Mazurek</p>
+		<div id="status-box">
+			<h2>BeatBox's Status</h2>
+			<p>Device is alive (hopefully)</p>
+		</div>
+		<div id="left-box">
+			<h2>Drum Beat Selection</h2>
+			<p>Current drum beat mode is: <b id="current-beat">Rock Beat</b></p> 
+			<form id="beat-form" >
+				<input type="button" id="btnBeat0" value="None"/>
+				<input type="button" id="btnBeat1" value="Rock Beat"/>
+				<input type="button" id="btnBeat2" value="Half-Time Shuffle"/>
+			</form>
+			<h3>Volume</h3>
+			<form id="volume-form" >
+				<input type="button" id="btnVolMinus" value=" - "/>
+				<input type="text" size="3" id="volumeText" value="80" readonly/>
+				<input type="button" id="btnVolPlus" value=" + "/>
+				<span>(0 - 100)</span>
+			</form>
+			<h3>Tempo</h3>
+			<form id="tempo-form" >
+				<input type="button" id="btnTempoMinus" value=" - "/>
+				<input type="text" size="3" id="tempoText" value="120" readonly/>
+				<input type="button" id="btnTempoPlus" value=" + "/>
+				<span>(BPM)</span>
+			</form>
+			<h2>Play Drum Sounds</h2>
+			<form id="tempo-form" >
+				<input type="button" id="btnBass" value="Bass"/>
+				<input type="button" id="btnHiHat" value="Hi-Hat"/>
+				<input type="button" id="btnSoftSnare" value="Soft Snare"/>
+				<input type="button" id="btnHardSnare" value="Hard Snare"/>
+			</form>
+			<h2>Exit</h2>
+			<input type="button" id="btnTerminate" value="Terminate Program"/>
+		</div>
 	</div>
 	
 	<script src='/socket.io/socket.io.js' type='text/javascript'></script>
